@@ -1,0 +1,43 @@
+/**
+ * The amit etalon file
+ * this file is used to test all amit functionality
+ */
+[java_package="com.amitapi.etalon"]
+project amit_etalon;
+
+type PrimitiveTypes {
+	boolean theBoolen;
+	int theInt;
+	long theLong;
+	double theDouble;
+	string theString;
+	datetime theDate;
+	uuid theUiid;	
+}
+
+type ArrayPrimitiveTypes {
+	array boolean theBoolen;
+	array int theInt;
+	array long theLong;
+	array double theDouble;
+	array string theString;
+	array datetime theDate;
+	array uuid theUiid;	
+}
+
+type Base {
+	int v1;
+}
+
+type Derived1 : Base {
+	int v2;
+}
+
+type Derived2 : Base {
+	int v2;
+}
+
+type ComplexType {
+	Base base;
+	array Base moreBase;
+}

@@ -40,3 +40,40 @@
 		<#return value >
 	</#if>
 </#function>
+
+<#function baseType object >
+	<#if object.getBaseTypeName()?? >
+		<#return "extends " + object.getBaseTypeName() >
+	<#else>
+		<#return ""> 
+	</#if>
+</#function>
+ 
+<#function deserializeMember member >
+		<#switch member.getTypeName()>
+		<#case "boolean">
+			<#return "j.getBooleanValue()" >
+		<#break>
+		<#case "int">
+			<#return "j.getIntValue()" >
+		<#break>
+		<#case "string">
+			<#return "j.getText()" >
+		<#break>
+		<#case "long">
+			<#return "j.getLongValue()" >
+		<#break>
+		<#case "double">
+			<#return "j.getDoubleValue()" >
+		<#break>
+		<#case "uuid">
+			<#return "UUID.fromString( j.getText() )" >
+		<#break>
+		<#case "datetime">
+			<#return "LocalDateTime.parse( j.getText() )" >
+		<#break>
+		<#default>
+			<#return member.getTypeName() + ".deserialize( j )" >
+		</#switch>
+</#function>
+ 

@@ -38,7 +38,7 @@
 				<executions>
 					<execution>
 						<configuration>
-							<compileFile>persons.amit</compileFile>
+							<compileFile>amit-etalon.amit</compileFile>
 							<templateUrl>src/main/resources</templateUrl>
 							<outputDirectory>src/main/tmp</outputDirectory>
 						</configuration>

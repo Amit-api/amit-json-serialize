@@ -9,6 +9,7 @@ package ${attrJavaPackage};
 import java.util.Objects;
 <#if object.dependsOnTypeArray() >
 import java.util.List;
+import java.util.ArrayList;
 </#if>
 <#if object.dependsOnType( "datetime" ) >
 import java.time.LocalDateTime;
@@ -18,31 +19,58 @@ import java.util.UUID;
 </#if>
 
 import java.io.IOException;
+
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 
 /**
  * type ${object.getName()}
  */
-public class ${object.getName()} {
+public class ${object.getName()} ${my.baseType( object )} {
 <#list object.getMembers() as member >
 	private ${my.javaType( member ) } ${member.getName()};
 </#list>	
 
 <#list object.getMembers() as member >
 	<#assign type = my.javaType( member ) >
+	<#assign noarraytype = my.javaTypeNoArray( member ) >
 	<#assign name = member.getName() >	
 	<#assign Aname = amit.AUpper( member.getName() ) >	
+	<#if member.isArray() >
+	public ${type} get${Aname}List() {
+		return ${name};
+	}
+	public void set${Aname}List( ${type} ${name} ) {
+		this.${name} = ${name};
+	}
+	public ${object.getName()} with${Aname}( ${noarraytype} ${name} ) {
+		if( this.${name} == null ) {
+			this.${name} = new ArrayList<${noarraytype}>();
+		}
+		this.${name}.add( ${name} );
+		return this;	
+	}
+	<#else>
 	public ${type} get${Aname}() {
 		return ${name};
 	}
 	public void set${Aname}( ${type} ${name} ) {
 		this.${name} = ${name};
 	}
+	public ${object.getName()} with${Aname}( ${type} ${name} ) {
+		this.${name} = ${name};
+		return this;	
+	}		
+	</#if>
 
 </#list>
 	@Override
 	public int hashCode() {
 		return Objects.hash(
+<#if object.getBaseTypeName()?? >
+			super.hashCode()<#if object.getMembers()?size != 0 >,</#if>
+</#if>	
 <#list object.getMembers() as member >
 			${member.getName()}<#if member_has_next>,</#if>
 </#list>	
@@ -55,10 +83,16 @@ public class ${object.getName()} {
 			return false;
 		}
 
-		if( getClass() != obj.getClass() ) {
+		if( !( obj instanceof ${object.getName()} ) ) {
+			return false;
+		} 
+
+<#if object.getBaseTypeName()?? >
+		if( !super.equals( obj ) ) {
 			return false;
 		}
-
+		
+</#if>
 		${object.getName()} other = (${object.getName()}) obj;
 
 		return 
@@ -72,24 +106,39 @@ public class ${object.getName()} {
 	public String toString() {
 		StringBuffer sb = new StringBuffer();
 		sb.append( "${object.getName()} [" );
-<#list object.getMembers() as member >
-		
-		sb.append( "${member.getName()}" );
-		sb.append( "=" );
-		sb.append( ${member.getName()} );
-		<#if member_has_next>sb.append( "," );</#if>
-</#list>
+		toString( sb );
 		sb.append( "]" );
 		return sb.toString();
 	}
+
+	protected void toString( StringBuffer sb ) { 
+<#if object.getBaseTypeName()?? >
+		super.toString( sb );
+</#if>	
+<#list object.getMembers() as member >		
+		sb.append( "${member.getName()}" ); sb.append( "=" ); sb.append( ${member.getName()} );<#if member_has_next>sb.append( "," );</#if>
+</#list>
+	}
 	
+	/**
+	 * streaming serialization to json
+	 */	
 	public void serialize( JsonGenerator j ) throws IOException {
 		j.writeStartObject();
+		j.writeFieldName( "__type" );
+		j.writeString( "${object.getName()}" );
+		serializeMembers( j );
+		j.writeEndObject();
+	}
+	
+	protected void serializeMembers( JsonGenerator j ) throws IOException {
+<#if object.getBaseTypeName()?? >
+		super.serializeMembers( j );
+</#if>	
 <#list object.getMembers() as member >
-		
 		if( ${member.getName()} != null ) {
-			j.writeFieldName( "${member.getName()}" );
 	<#if member.isArray() >
+			j.writeFieldName( "${member.getName()}s" );
 			j.writeStartArray();
 			for( ${my.javaTypeNoArray( member )} obj : ${member.getName()} ) {
 		<#switch member.getTypeName()>
@@ -120,6 +169,7 @@ public class ${object.getName()} {
 			}
 			j.writeEndArray();
 	<#else>
+			j.writeFieldName( "${member.getName()}" );
 		<#switch member.getTypeName()>
 		<#case "boolean">
 			j.writeBoolean( ${member.getName()} );
@@ -148,20 +198,45 @@ public class ${object.getName()} {
 	</#if>
 		}
 </#list>
-
-		j.writeEndObject();
 	}
 	
 	public static ${object.getName()} deserialize( JsonParser j ) throws IOException {
-		if (j.nextToken() != JsonToken.START_OBJECT) {
+		if( j.nextToken() != JsonToken.START_OBJECT ) {
 			throw new IllegalArgumentException ( "Expected data to start with an Object" );
 		}
-		
 		${object.getName()} result = new ${object.getName()}();
 		
 		while( j.nextToken() != JsonToken.END_OBJECT ) {
-		
+			String fieldName = j.getCurrentName();				
+			j.nextToken();
+			result.parseToken( fieldName, j );
 		}
 		return result;
+	}
+	
+	protected boolean parseToken( String fieldName, JsonParser j ) throws IOException {
+<#list object.getMembers() as member >
+	<#assign noarraytype = my.javaTypeNoArray( member ) >
+	<#assign name = member.getName() >	
+	
+	<#if member.isArray() >
+		if( fieldName.equals( "${name}s" ) ) {
+			if( j.isExpectedStartArrayToken() ) {
+				if( ${name} == null ) {
+					${name} = new ArrayList<${noarraytype}>();
+				}
+				while( j.nextToken() != JsonToken.END_ARRAY ) {
+					${name}.add( ${ my.deserializeMember( member ) } );
+				}
+			}
+		}
+	<#else>
+		if( fieldName.equals( "${name}" ) ) {
+			${name} = ${ my.deserializeMember( member ) };
+			return true;
+		} <#if member_has_next> else</#if> 
+	</#if>
+</#list>
+		return false;
 	}
 }
