@@ -5,6 +5,18 @@
 [java_package="com.amitapi.etalon"]
 project amit_etalon;
 
+enum IntEnum {
+	first = 1,
+	second = 2,
+	third = 3
+}
+
+enum StringEnum {
+	first = "first",
+	second = "second",
+	third = "th\"ird"
+}
+
 type PrimitiveTypes {
 	boolean theBoolen;
 	int theInt;
@@ -23,6 +35,13 @@ type ArrayPrimitiveTypes {
 	array string theString;
 	array datetime theDate;
 	array uuid theUiid;	
+}
+
+type Enums {
+	IntEnum e1;
+	array IntEnum e2;
+	StringEnum e3;
+	StringEnum e4;
 }
 
 type Base {

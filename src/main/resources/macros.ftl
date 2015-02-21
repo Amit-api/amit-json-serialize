@@ -64,7 +64,11 @@ import com.fasterxml.jackson.core.JsonParser;
 			<#assign value = "LocalDateTime" >
 		<#break>
 		<#default>
-			<#assign value = "JsonSerializable" >
+			<#if project.isEnumType( member.getTypeName() ) >
+				<#assign value = "JsonSerializableEnum" >
+			<#else>
+				<#assign value = "JsonSerializable" >
+			</#if>
 	</#switch>
 
 	<#return value >
@@ -140,7 +144,9 @@ import com.fasterxml.jackson.core.JsonParser;
 	<#if item.isArray() >
 		if( fieldName.equals( "${name}s" ) ) {
 		<#if project.isPrimitiveType( type ) >
-			${name} = AmitJsonSerialize.read${stype}( jp, "${name}s", ${name} );
+			${name} = AmitJsonSerialize.read${stype}( jp, fieldName, ${name} );
+		<#elseif project.isEnumType( type ) >
+			${name} = AmitJsonSerialize.read${stype}( jp, fieldName, ${name}, ${noarrayjtype}.values() );
 		<#else>
 			if( ${name} == null ) {
 				${name} = new ArrayList<${noarrayjtype}>();
@@ -153,7 +159,9 @@ import com.fasterxml.jackson.core.JsonParser;
 	<#else>
 		if( fieldName.equals( "${name}" ) ) {
 		<#if project.isPrimitiveType( type ) >
-			${name} = AmitJsonSerialize.read${stype}( jp, "${name}" );
+			${name} = AmitJsonSerialize.read${stype}( jp, fieldName );
+		<#elseif project.isEnumType( type ) >
+			${name} = AmitJsonSerialize.read${stype}( jp, fieldName, ${type}.values() );
 		<#else>
 			${name} = (${type})AmitJsonSerialize.
 				readJsonSerializable( jp, fieldName, ${type}.getFactoryMap(), ${type}.FACTORY );
