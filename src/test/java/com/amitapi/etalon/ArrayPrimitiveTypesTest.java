@@ -51,5 +51,4 @@ public class ArrayPrimitiveTypesTest {
 		
 		assertEquals( orig, obj );
 	}
-	
 }

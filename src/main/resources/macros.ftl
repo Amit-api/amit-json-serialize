@@ -1,4 +1,9 @@
+import com.amitapi.json.runtime.AmitJsonSerialize;
+import com.fasterxml.jackson.core.JsonParser;
 
+
+<#-- *********************************************************************************************** -->
+<#-- *********************************************************************************************** -->
 <#function javaTypeNoArray member >
 
 	<#assign value = "unknown" >
@@ -25,13 +30,49 @@
 			<#assign value = "LocalDateTime" >
 		<#break>
 		<#default>
-		<#assign value = member.getTypeName() >
+			<#assign value = member.getTypeName() >
 	</#switch>
 
 	<#return value >
 </#function>
 
+<#-- *********************************************************************************************** -->
+<#-- *********************************************************************************************** -->
+<#function jsonSerializeType member >
+
+	<#assign value = "unknown" >
+	<#switch member.getTypeName()>
+		<#case "boolean">
+			<#assign value = "Boolean" >
+		<#break>
+		<#case "int">
+			<#assign value = "Integer" >
+		<#break>
+		<#case "string">
+			<#assign value = "String" >
+		<#break>
+		<#case "long">
+			<#assign value = "Long" >
+		<#break>
+		<#case "double">
+			<#assign value = "Double" >
+		<#break>
+		<#case "uuid">
+			<#assign value = "UUID" >
+		<#break>
+		<#case "datetime">
+			<#assign value = "LocalDateTime" >
+		<#break>
+		<#default>
+			<#assign value = "JsonSerializable" >
+	</#switch>
+
+	<#return value >
+</#function>
+
+<#-- *********************************************************************************************** -->
 <#-- function to get java type from the model type -->
+<#-- *********************************************************************************************** -->
 <#function javaType member >
 	<#assign value = javaTypeNoArray( member ) >
 	<#if member.isArray() >
@@ -45,35 +86,249 @@
 	<#if object.getBaseTypeName()?? >
 		<#return "extends " + object.getBaseTypeName() >
 	<#else>
-		<#return ""> 
+		<#return "extends JsonSerializable"> 
 	</#if>
 </#function>
- 
-<#function deserializeMember member >
-		<#switch member.getTypeName()>
-		<#case "boolean">
-			<#return "j.getBooleanValue()" >
-		<#break>
-		<#case "int">
-			<#return "j.getIntValue()" >
-		<#break>
-		<#case "string">
-			<#return "j.getText()" >
-		<#break>
-		<#case "long">
-			<#return "j.getLongValue()" >
-		<#break>
-		<#case "double">
-			<#return "j.getDoubleValue()" >
-		<#break>
-		<#case "uuid">
-			<#return "UUID.fromString( j.getText() )" >
-		<#break>
-		<#case "datetime">
-			<#return "LocalDateTime.parse( j.getText() )" >
-		<#break>
-		<#default>
-			<#return member.getTypeName() + ".deserialize( j )" >
-		</#switch>
-</#function>
- 
+
+<#-- *********************************************************************************************** -->
+<#-- generates a class factory -->
+<#-- *********************************************************************************************** -->
+<#macro classFactory name >
+	/**
+	 * ${name} factory
+	 */
+	protected static final JsonSerializableFactory FACTORY = new JsonSerializableFactory() {
+		public String getName() { return "${name}"; }
+		public JsonSerializable create() { return new ${name}(); }
+	};
+	
+	/**
+	 * ${name} factory map
+	 */
+	protected static JsonSerializableFactoryMap getFactoryMap() {
+		return OnDemandInit.FACTORYMAP;
+	}
+	private static class OnDemandInit {
+		private static final JsonSerializableFactoryMap FACTORYMAP = new JsonSerializableFactoryMap()
+<#list project.getCompositeTypeChildren( name ) as childTypeName >
+			.with( ${childTypeName}.FACTORY )
+</#list>	
+			.with( ${name}.FACTORY );
+	}
+</#macro>
+
+
+<#-- *********************************************************************************************** -->
+<#-- generates a parseToken function                                                                 -->
+<#-- *********************************************************************************************** -->
+<#macro parseTokenFunction items hasBaseType >
+	/**
+	 * {@inheritDoc}
+	 */	
+	@Override
+	protected boolean parseToken( JsonParser jp, String fieldName ) throws IOException {
+<#if hasBaseType >
+		if( super.parseToken( jp, fieldName ) ) {
+			return true;
+		}
+</#if>
+<#list items as item >
+	<#assign stype = jsonSerializeType( item ) >
+	<#assign name = item.getName() >
+	<#assign type = item.getTypeName() >
+	<#assign noarrayjtype = javaTypeNoArray( item ) >
+	<#if item.isArray() >
+		if( fieldName.equals( "${name}s" ) ) {
+		<#if project.isPrimitiveType( type ) >
+			${name} = AmitJsonSerialize.read${stype}( jp, "${name}s", ${name} );
+		<#else>
+			if( ${name} == null ) {
+				${name} = new ArrayList<${noarrayjtype}>();
+			}
+			AmitJsonSerialize.readJsonSerializable( 
+					jp, fieldName, ${noarrayjtype}.getFactoryMap(), ${noarrayjtype}.FACTORY, ${name} );
+		</#if>
+			return true;
+		}
+	<#else>
+		if( fieldName.equals( "${name}" ) ) {
+		<#if project.isPrimitiveType( type ) >
+			${name} = AmitJsonSerialize.read${stype}( jp, "${name}" );
+		<#else>
+			${name} = (${type})AmitJsonSerialize.
+				readJsonSerializable( jp, fieldName, ${type}.getFactoryMap(), ${type}.FACTORY );
+		</#if>
+			return true;
+		} <#if item_has_next> else</#if> 
+	</#if>
+</#list>
+		return false;
+	}
+</#macro>
+<#-- *********************************************************************************************** -->
+<#-- generates class members                                                                         -->
+<#-- *********************************************************************************************** -->
+<#macro classMembers items >
+<#list items as item >
+	<#assign jtype = javaType( item ) >
+	<#assign name = item.getName() >	
+	private ${jtype} ${name};
+</#list>
+</#macro>
+
+<#-- *********************************************************************************************** -->
+<#-- generates class getters and setters                                                             -->
+<#-- *********************************************************************************************** -->
+<#macro classGettersSetters items className >
+<#list items as item >
+	<#assign jtype = javaType( item ) >
+	<#assign noarrayjtype = javaTypeNoArray( item ) >
+	<#assign name = item.getName() >	
+	<#assign Aname = amit.AUpper( item.getName() ) >
+	
+	<#if item.isArray() >
+	public ${jtype} get${Aname}List() {
+		return ${name};
+	}
+	public void set${Aname}List( ${jtype} ${name} ) {
+		this.${name} = ${name};
+	}
+	public ${className} with${Aname}( ${noarrayjtype} ${name} ) {
+		if( this.${name} == null ) {
+			this.${name} = new ArrayList<${noarrayjtype}>();
+		}
+		this.${name}.add( ${name} );
+		return this;	
+	}
+	<#else>
+	public ${jtype} get${Aname}() {
+		return ${name};
+	}
+	public void set${Aname}( ${jtype} ${name} ) {
+		this.${name} = ${name};
+	}
+	public ${className} with${Aname}( ${jtype} ${name} ) {
+		this.${name} = ${name};
+		return this;	
+	}		
+	</#if>
+</#list>
+</#macro>
+
+<#-- *********************************************************************************************** -->
+<#-- generates hashCode function                                                                     -->
+<#-- *********************************************************************************************** -->
+<#macro hashCodeFunction items hasBaseType >
+	@Override
+	public int hashCode() {
+		return Objects.hash(
+	<#if hasBaseType >
+			super.hashCode()<#if items?size != 0 >,</#if>
+	</#if>	
+<#list items as item >
+	<#assign name = item.getName() >	
+			${name}<#if item_has_next>,</#if>
+</#list>	
+		);
+	}
+</#macro>
+
+<#-- *********************************************************************************************** -->
+<#-- generates equals function                                                                       -->
+<#-- *********************************************************************************************** -->
+<#macro equalsFunction items hasBaseType className >
+	@Override
+	public boolean equals( Object obj ) {
+		if( obj == null ) return false;
+		if( !( obj instanceof ${className} ) ) return false;
+<#if hasBaseType >
+		if( !super.equals( obj ) ) return false;
+</#if>
+
+		${className} other = (${className}) obj;
+
+		return 
+<#list items as item >
+	<#assign name = item.getName() >	
+			Objects.equals( this.${name}, other.${name} ) <#if item_has_next>&&</#if>
+</#list>	
+		;
+	}
+</#macro>
+
+<#-- *********************************************************************************************** -->
+<#-- generates toString function                                                                     -->
+<#-- *********************************************************************************************** -->
+<#macro toStringFunction items hasBaseType className >
+	@Override
+	public String toString() {
+		StringBuffer sb = new StringBuffer();
+		sb.append( "${className} [" );
+		toString( sb );
+		sb.append( "]" );
+		return sb.toString();
+	}
+	
+<#if hasBaseType >
+	@Override	
+</#if>	
+	protected void toString( StringBuffer sb ) { 
+<#if hasBaseType >
+		super.toString( sb );
+</#if>	
+<#list items as item >
+	<#assign name = item.getName() >	
+		sb.append( "${name}" ); sb.append( "=" ); sb.append( ${name} );<#if item_has_next>sb.append( "," );</#if>
+</#list>
+	}
+</#macro>
+
+<#-- *********************************************************************************************** -->
+<#-- generates serialize functions                                                                   -->
+<#-- *********************************************************************************************** -->
+<#macro serializeFuctions className >
+	/**
+	 * {@inheritDoc} serialize ${className} type
+	 */	
+	@Override
+	protected void serialize( JsonGenerator jg ) throws IOException {
+		jg.writeStartObject();
+		jg.writeFieldName( AmitJsonSerialize.typeFieldName );
+		jg.writeString( "${className}" );
+		serializeMembers( jg );
+		jg.writeEndObject();
+	}
+
+	/**
+	 * deserialize an object of instance of ${className}
+	 */
+	protected static ${className} deserialize( JsonParser jp ) throws IOException {
+		jp.nextToken();
+		return (${className})AmitJsonSerialize.
+				readJsonSerializable( jp, "<root>",${className}.getFactoryMap(), ${className}.FACTORY );
+	}	
+</#macro>
+
+<#-- *********************************************************************************************** -->
+<#-- generates serializeMembers functions                                                            -->
+<#-- *********************************************************************************************** -->
+<#macro serializeMembersFunction items hasBaseType >
+	/**
+	 * {@inheritDoc}
+	 */	
+	@Override
+	protected void serializeMembers( JsonGenerator jg ) throws IOException {
+<#if hasBaseType >
+		super.serializeMembers( jg );
+</#if>	
+<#list items as item >
+	<#assign stype = jsonSerializeType( item ) >
+	<#assign name = item.getName() >	
+	<#if item.isArray() >
+		AmitJsonSerialize.write${stype}( jg, "${name}s", ${name} );
+	<#else>
+		AmitJsonSerialize.write${stype}( jg, "${name}", ${name} );
+	</#if>
+</#list>
+	}
+</#macro>

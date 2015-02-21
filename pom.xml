@@ -26,6 +26,11 @@
 			<artifactId>jackson-core</artifactId>
 			<version>[2.5,)</version>
 		</dependency>
+		<dependency>
+			<groupId>com.amitapi</groupId>
+			<artifactId>amit-json-runtime</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 
 	<build>
