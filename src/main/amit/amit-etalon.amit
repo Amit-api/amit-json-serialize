@@ -98,3 +98,25 @@ exception ComplexTypeException {
 	Base base;
 	array Base moreBase;
 }
+
+interface InterfaceTypes {
+	
+	void storeNumber( int intV, boolean boolV, long longV, double doubleV );
+	
+	void storeOtherType( string strV, datetime dateV, uuid uuidV ) throws MyException;
+}
+
+interface IntrfaceArrayTypes {
+	void storeNumbers( array int intV, array boolean boolV, array long longV, array double doubleV ) throws MyArrayException;
+	
+	void storeOtherTypes( array string strV, array datetime dateV, array uuid uuidV ) throws MyArrayException;	
+}
+
+interface InterfaceReturn {
+	PrimitiveTypes getTypes( int id ) throws MyException;
+}
+
+interface AllInt : InterfaceTypes, IntrfaceArrayTypes, InterfaceReturn {
+	void doNothing();
+}
+

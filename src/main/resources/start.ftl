@@ -18,7 +18,7 @@ done: ${processed}
 done: ${processed}
 </#list>
 
-<#list amit.generate( "interface","inteface.ftl", resultPath + "/%s.java" ) as processed>
+<#list amit.generate( "interface","interface.ftl", resultPath + "/%s.java" ) as processed>
 done: ${processed}
 </#list>
 

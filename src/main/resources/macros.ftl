@@ -8,6 +8,9 @@ import com.fasterxml.jackson.core.JsonParser;
 
 	<#assign value = "unknown" >
 	<#switch member.getTypeName()>
+		<#case "void">
+			<#assign value = "void" >
+		<#break>
 		<#case "boolean">
 			<#assign value = "Boolean" >
 		<#break>
@@ -42,6 +45,9 @@ import com.fasterxml.jackson.core.JsonParser;
 
 	<#assign value = "unknown" >
 	<#switch member.getTypeName()>
+		<#case "void">
+			<#assign value = "void" >
+		<#break>
 		<#case "boolean">
 			<#assign value = "Boolean" >
 		<#break>
@@ -344,3 +350,14 @@ import com.fasterxml.jackson.core.JsonParser;
 </#list>
 	}
 </#macro>
+<#-- *********************************************************************************************** -->
+<#-- generates throws exceptions                                                           -->
+<#-- *********************************************************************************************** -->
+<#macro throwsExceptions items >
+<#if items?size != 0 >throws <#list items as item >${item}<#if item_has_next>, </#if></#list></#if></#macro>
+
+<#-- *********************************************************************************************** -->
+<#-- generates implements interfaces exceptions                                                           -->
+<#-- *********************************************************************************************** -->
+<#macro extendsInterfaces items >
+<#if items?size != 0 >extends <#list items as item >${item}<#if item_has_next>, </#if></#list> </#if></#macro>
