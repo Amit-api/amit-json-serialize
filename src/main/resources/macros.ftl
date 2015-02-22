@@ -107,19 +107,22 @@ import com.fasterxml.jackson.core.JsonParser;
 <#-- *********************************************************************************************** -->
 <#-- generates a class factory -->
 <#-- *********************************************************************************************** -->
-<#macro classFactory name children >
+<#macro classFactory name children=[] >
 	/**
 	 * ${name} factory
+	 * !!! only for internal use
 	 */
-	protected static final JsonSerializableFactory FACTORY = new JsonSerializableFactory() {
+	public static final JsonSerializableFactory FACTORY = new JsonSerializableFactory() {
 		public String getName() { return "${name}"; }
 		public JsonSerializable create() { return new ${name}(); }
 	};
-	
+
+<#if children?size !=0 >	
 	/**
 	 * ${name} factory map
+	 * !!! only for internal use
 	 */
-	protected static JsonSerializableFactoryMap getFactoryMap() {
+	public static JsonSerializableFactoryMap getFactoryMap() {
 		return OnDemandInit.FACTORYMAP;
 	}
 	private static class OnDemandInit {
@@ -129,6 +132,15 @@ import com.fasterxml.jackson.core.JsonParser;
 </#list>	
 			.with( ${name}.FACTORY );
 	}
+<#else>
+	/**
+	 * ${name} factory map
+	 * !!! only for internal use
+	 */
+	public static JsonSerializableFactoryMap getFactoryMap() {
+		return null;
+	}
+</#if>
 </#macro>
 
 
@@ -138,6 +150,7 @@ import com.fasterxml.jackson.core.JsonParser;
 <#macro parseTokenFunction items hasBaseType >
 	/**
 	 * {@inheritDoc}
+	 * !!! only for internal use
 	 */	
 	@Override
 	public boolean parseToken( JsonParser jp, String fieldName ) throws IOException {
@@ -239,6 +252,9 @@ import com.fasterxml.jackson.core.JsonParser;
 <#macro hashCodeFunction items hasBaseType >
 	@Override
 	public int hashCode() {
+<#if items?size == 0 >
+		return 0;
+<#else>
 		return Objects.hash(
 	<#if hasBaseType >
 			super.hashCode()<#if items?size != 0 >,</#if>
@@ -248,6 +264,7 @@ import com.fasterxml.jackson.core.JsonParser;
 			${name}<#if item_has_next>,</#if>
 </#list>	
 		);
+</#if>		
 	}
 </#macro>
 
@@ -262,15 +279,17 @@ import com.fasterxml.jackson.core.JsonParser;
 <#if hasBaseType >
 		if( !super.equals( obj ) ) return false;
 </#if>
-
+<#if items?size == 0 >
+		return true;
+<#else>		
 		${className} other = (${className}) obj;
-
 		return 
 <#list items as item >
 	<#assign name = item.getName() >	
 			Objects.equals( this.${name}, other.${name} ) <#if item_has_next>&&</#if>
 </#list>	
 		;
+</#if>		
 	}
 </#macro>
 
@@ -304,11 +323,13 @@ import com.fasterxml.jackson.core.JsonParser;
 <#-- *********************************************************************************************** -->
 <#-- generates serialize functions                                                                   -->
 <#-- *********************************************************************************************** -->
-<#macro serializeFuctions className >
+<#macro serializeFuctions className hasBaseType=true >
 	/**
 	 * {@inheritDoc} serialize ${className} type
 	 */	
+<#if hasBaseType >
 	@Override
+</#if>	
 	public void serialize( JsonGenerator jg ) throws IOException {
 		jg.writeStartObject();
 		jg.writeFieldName( AmitJsonSerialize.typeFieldName );

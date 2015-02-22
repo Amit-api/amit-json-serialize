@@ -22,4 +22,8 @@ done: ${processed}
 done: ${processed}
 </#list>
 
+<#list amit.generate( "interface","interface-call.ftl", resultPath + "/call/Call%s.java" ) as processed>
+done: ${processed}
+</#list>
+
 End generate.

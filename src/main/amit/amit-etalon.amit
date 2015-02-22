@@ -114,6 +114,7 @@ interface IntrfaceArrayTypes {
 
 interface InterfaceReturn {
 	PrimitiveTypes getTypes( int id ) throws MyException;
+	void setTypes( PrimitiveTypes types ) throws MyException;
 }
 
 interface AllInt : InterfaceTypes, IntrfaceArrayTypes, InterfaceReturn {
