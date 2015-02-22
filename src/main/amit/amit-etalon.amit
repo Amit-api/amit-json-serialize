@@ -60,3 +60,41 @@ type ComplexType {
 	Base base;
 	array Base moreBase;
 }
+
+exception MyException {
+	boolean theBoolen;
+	int theInt;
+	long theLong;
+	double theDouble;
+	string theString;
+	datetime theDate;
+	uuid theUiid;
+}
+
+exception MyArrayException {
+	array boolean theBoolen;
+	array int theInt;
+	array long theLong;
+	array double theDouble;
+	array string theString;
+	array datetime theDate;
+	array uuid theUiid;	
+}
+
+
+exception BaseException {
+	int v1;
+}
+
+exception Derived1Exception : BaseException {
+	int v2;
+}
+
+exception Derived2Exception : BaseException {
+	int v2;
+}
+
+exception ComplexTypeException {
+	Base base;
+	array Base moreBase;
+}

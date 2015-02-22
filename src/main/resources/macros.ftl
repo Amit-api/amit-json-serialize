@@ -90,14 +90,18 @@ import com.fasterxml.jackson.core.JsonParser;
 	<#if object.getBaseTypeName()?? >
 		<#return "extends " + object.getBaseTypeName() >
 	<#else>
-		<#return "extends JsonSerializable"> 
+		<#if object.getType() == "exception" >
+			<#return "extends JsonSerializableException">
+		<#else>
+			<#return "implements JsonSerializable">
+		</#if>
 	</#if>
 </#function>
 
 <#-- *********************************************************************************************** -->
 <#-- generates a class factory -->
 <#-- *********************************************************************************************** -->
-<#macro classFactory name >
+<#macro classFactory name children >
 	/**
 	 * ${name} factory
 	 */
@@ -114,7 +118,7 @@ import com.fasterxml.jackson.core.JsonParser;
 	}
 	private static class OnDemandInit {
 		private static final JsonSerializableFactoryMap FACTORYMAP = new JsonSerializableFactoryMap()
-<#list project.getCompositeTypeChildren( name ) as childTypeName >
+<#list  children as childTypeName >
 			.with( ${childTypeName}.FACTORY )
 </#list>	
 			.with( ${name}.FACTORY );
@@ -130,7 +134,7 @@ import com.fasterxml.jackson.core.JsonParser;
 	 * {@inheritDoc}
 	 */	
 	@Override
-	protected boolean parseToken( JsonParser jp, String fieldName ) throws IOException {
+	public boolean parseToken( JsonParser jp, String fieldName ) throws IOException {
 <#if hasBaseType >
 		if( super.parseToken( jp, fieldName ) ) {
 			return true;
@@ -299,7 +303,7 @@ import com.fasterxml.jackson.core.JsonParser;
 	 * {@inheritDoc} serialize ${className} type
 	 */	
 	@Override
-	protected void serialize( JsonGenerator jg ) throws IOException {
+	public void serialize( JsonGenerator jg ) throws IOException {
 		jg.writeStartObject();
 		jg.writeFieldName( AmitJsonSerialize.typeFieldName );
 		jg.writeString( "${className}" );
@@ -310,7 +314,7 @@ import com.fasterxml.jackson.core.JsonParser;
 	/**
 	 * deserialize an object of instance of ${className}
 	 */
-	protected static ${className} deserialize( JsonParser jp ) throws IOException {
+	public static ${className} deserialize( JsonParser jp ) throws IOException {
 		jp.nextToken();
 		return (${className})AmitJsonSerialize.
 				readJsonSerializable( jp, "<root>",${className}.getFactoryMap(), ${className}.FACTORY );
@@ -325,7 +329,7 @@ import com.fasterxml.jackson.core.JsonParser;
 	 * {@inheritDoc}
 	 */	
 	@Override
-	protected void serializeMembers( JsonGenerator jg ) throws IOException {
+	public void serializeMembers( JsonGenerator jg ) throws IOException {
 <#if hasBaseType >
 		super.serializeMembers( jg );
 </#if>	

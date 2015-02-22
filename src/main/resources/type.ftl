@@ -45,5 +45,5 @@ public class ${objectName} ${my.baseType( object )} {
 		
 <@my.parseTokenFunction items=object.getMembers() hasBaseType=object.getBaseTypeName()?? />
 	
-<@my.classFactory name=objectName />	
+<@my.classFactory name=objectName children=project.getCompositeTypeChildren( objectName ) />	
 }

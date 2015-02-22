@@ -6,9 +6,7 @@
  */
 package ${attrJavaPackage};
 
-import com.fasterxml.jackson.core.JsonParser;
-import java.io.IOException;
-import com.amitapi.json.runtime.*;
+import com.amitapi.json.runtime.JsonSerializableEnum;
 
 public enum ${objectName} implements JsonSerializableEnum {
 	
@@ -39,29 +37,5 @@ public enum ${objectName} implements JsonSerializableEnum {
 	
 	public Integer getIntegerValue() {
 		return intValue;
-	}
-	
-	protected static ${objectName} deserialize( JsonParser jp ) throws IOException {
-		String stringValue = jp.getText();
-		Integer intNumber = null;
-		
-		try {
-			intNumber = Integer.valueOf( stringValue );
-		} catch( NumberFormatException e ) {
-		}
-		
-		for( ${objectName} value : values() ) {
-			if( intNumber != null && value.intValue != null ) {
-				if( intNumber.equals( value.intValue ) ) {
-					return value;
-				}
-			} else {
-				if( stringValue.equals( value.stringValue ) ) {
-					return value;
-				}
-			}
-		}
-		
-		throw new IllegalArgumentException( String.format( "Unknown enum value '%s'", stringValue ) );
 	}
 }
