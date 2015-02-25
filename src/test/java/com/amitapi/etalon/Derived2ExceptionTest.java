@@ -23,7 +23,7 @@ public class Derived2ExceptionTest {
 	public void testSerialize() throws IOException {			
 		StringWriter writer = new StringWriter();
 		JsonGenerator j = jfactory.createGenerator( writer );
-		orig.serialize( j );
+		orig.__serialize( j );
 		j.close();
 		
 		assertEquals( json, writer.toString() );
@@ -33,7 +33,7 @@ public class Derived2ExceptionTest {
 	public void testDeSerialize() throws IOException {
 		JsonParser j = jfactory.createParser( json );
 		
-		BaseException obj = BaseException.deserialize( j );
+		BaseException obj = BaseException.__deserialize( j );
 		
 		assertEquals( orig, obj );
 	}	

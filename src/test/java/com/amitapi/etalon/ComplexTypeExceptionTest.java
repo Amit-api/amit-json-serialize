@@ -26,7 +26,7 @@ public class ComplexTypeExceptionTest {
 	public void testSerialize() throws IOException {			
 		StringWriter writer = new StringWriter();
 		JsonGenerator j = jfactory.createGenerator( writer );
-		orig.serialize( j );
+		orig.__serialize( j );
 		j.close();
 		
 		assertEquals( json, writer.toString() );
@@ -36,7 +36,7 @@ public class ComplexTypeExceptionTest {
 	public void testDeSerialize() throws IOException {
 		JsonParser j = jfactory.createParser( json );
 		
-		ComplexTypeException obj = ComplexTypeException.deserialize( j );
+		ComplexTypeException obj = ComplexTypeException.__deserialize( j );
 		
 		assertEquals( orig, obj );
 	}	

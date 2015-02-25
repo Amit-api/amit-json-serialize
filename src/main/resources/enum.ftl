@@ -6,9 +6,7 @@
  */
 package ${attrJavaPackage};
 
-import com.amitapi.json.runtime.JsonSerializableEnum;
-
-public enum ${objectName} implements JsonSerializableEnum {
+public enum ${objectName} implements com.amitapi.json.runtime.__JsonSerializableEnum {
 	
 <#list object.getValues() as value >
 	<#assign name = value.getName()?upper_case >
@@ -31,11 +29,17 @@ public enum ${objectName} implements JsonSerializableEnum {
 		}
 	}
 	
-	public String getStringValue() {
+	/**
+	 * !!! for internal use only
+	 */
+	public String __getStringValue() {
 		return stringValue;
 	}
 	
-	public Integer getIntegerValue() {
+	/**
+	 * !!! for internal use only
+	 */
+	public Integer __getIntegerValue() {
 		return intValue;
 	}
 }

@@ -37,7 +37,7 @@ public class MyExceptionTest {
 				
 		StringWriter writer = new StringWriter();
 		JsonGenerator j = jfactory.createGenerator( writer );
-		orig.serialize( j );
+		orig.__serialize( j );
 		j.close();
 		
 		assertEquals( json, writer.toString() );
@@ -47,7 +47,7 @@ public class MyExceptionTest {
 	public void testDeSerializeJson() throws IOException {
 		JsonParser j = jfactory.createParser( json );
 		
-		MyException obj = MyException.deserialize( j );
+		MyException obj = MyException.__deserialize( j );
 		
 		assertEquals( orig, obj );
 	}

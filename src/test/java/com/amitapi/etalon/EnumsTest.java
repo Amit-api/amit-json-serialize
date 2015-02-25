@@ -29,7 +29,7 @@ public class EnumsTest {
 		StringWriter writer = new StringWriter();
 		JsonGenerator j = jfactory.createGenerator( writer );
 		
-		orig.serialize( j );
+		orig.__serialize( j );
 		j.close();
 		
 		assertEquals( json, writer.toString() );	
@@ -39,7 +39,7 @@ public class EnumsTest {
 	public void testDeSerialize() throws IOException {
 		JsonParser j = jfactory.createParser( json );
 		
-		Enums obj = Enums.deserialize( j );
+		Enums obj = Enums.__deserialize( j );
 		
 		assertEquals( orig, obj );
 	}	

@@ -37,7 +37,7 @@ public class ArrayPrimitiveTypesTest {
 		
 		StringWriter writer = new StringWriter();
 		JsonGenerator j = jfactory.createGenerator( writer );
-		orig.serialize( j );
+		orig.__serialize( j );
 		j.close();
 		
 		assertEquals( json, writer.toString() );
@@ -47,7 +47,7 @@ public class ArrayPrimitiveTypesTest {
 	public void testArrayPrimitiveDeSerializeJson() throws IOException {
 		JsonParser j = jfactory.createParser( json );
 		
-		ArrayPrimitiveTypes obj = ArrayPrimitiveTypes.deserialize( j );
+		ArrayPrimitiveTypes obj = ArrayPrimitiveTypes.__deserialize( j );
 		
 		assertEquals( orig, obj );
 	}

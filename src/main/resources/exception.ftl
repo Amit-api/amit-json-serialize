@@ -7,24 +7,6 @@
  */
 package ${attrJavaPackage};
 
-import java.util.Objects;
-<#if object.dependsOnTypeArray() >
-import java.util.List;
-import java.util.ArrayList;
-</#if>
-<#if object.dependsOnType( "datetime" ) >
-import java.time.LocalDateTime;
-</#if>
-<#if object.dependsOnType( "uuid" ) >
-import java.util.UUID;
-</#if>
-
-import java.io.IOException;
-
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.amitapi.json.runtime.*;
-
 /**
  * type ${objectName}
  */

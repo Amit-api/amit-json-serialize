@@ -113,7 +113,8 @@ interface IntrfaceArrayTypes {
 }
 
 interface InterfaceReturn {
-	PrimitiveTypes getTypes( int id ) throws MyException;
+	PrimitiveTypes getTypes( int id ) throws BaseException, MyArrayException;
+	array PrimitiveTypes getAllTypes() throws BaseException, MyArrayException;
 	void setTypes( PrimitiveTypes types ) throws MyException;
 }
 

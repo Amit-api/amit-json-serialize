@@ -7,16 +7,6 @@
  */
 package ${attrJavaPackage};
 
-<#if object.dependsOnTypeArray() >
-import java.util.List;
-</#if>
-<#if object.dependsOnType( "datetime" ) >
-import java.time.LocalDateTime;
-</#if>
-<#if object.dependsOnType( "uuid" ) >
-import java.util.UUID;
-</#if>
-
 /**
  * interface ${objectName}
  */
@@ -34,6 +24,6 @@ public interface ${objectName} <@my.extendsInterfaces items=object.getBaseInterf
 		<#assign atype = my.javaType( arg ) >
 		${atype} ${aname}<#if arg_has_next>,</#if>
 	</#list>
-	) <@my.throwsExceptions items=function.getThrowsExceptionNames() />;
+	) <@my.throwsExceptions items=function.getThrowsExceptionNames() />
 </#list>
 }

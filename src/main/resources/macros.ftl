@@ -1,39 +1,41 @@
-import com.amitapi.json.runtime.AmitJsonSerialize;
-import com.fasterxml.jackson.core.JsonParser;
-
-
+<#-- *********************************************************************************************** -->
+<#-- function to get java package -->
+<#-- *********************************************************************************************** -->
+<#function getJavaPackage >
+	<#return project.getProjectModule().getAttributeValue( "java_package", "com.noname" ) >
+</#function>
 <#-- *********************************************************************************************** -->
 <#-- *********************************************************************************************** -->
 <#function javaTypeNoArray member >
-
+	<#assign javaPackage = getJavaPackage() >
 	<#assign value = "unknown" >
 	<#switch member.getTypeName()>
 		<#case "void">
 			<#assign value = "void" >
 		<#break>
 		<#case "boolean">
-			<#assign value = "Boolean" >
+			<#assign value = "java.lang.Boolean" >
 		<#break>
 		<#case "int">
-			<#assign value = "Integer" >
+			<#assign value = "java.lang.Integer" >
 		<#break>
 		<#case "string">
-			<#assign value = "String" >
+			<#assign value = "java.lang.String" >
 		<#break>
 		<#case "long">
-			<#assign value = "Long" >
+			<#assign value = "java.lang.Long" >
 		<#break>
 		<#case "double">
-			<#assign value = "Double" >
+			<#assign value = "java.lang.Double" >
 		<#break>
 		<#case "uuid">
-			<#assign value = "UUID" >
+			<#assign value = "java.util.UUID" >
 		<#break>
 		<#case "datetime">
-			<#assign value = "LocalDateTime" >
+			<#assign value = "java.time.LocalDateTime" >
 		<#break>
 		<#default>
-			<#assign value = member.getTypeName() >
+			<#assign value = javaPackage + "." + member.getTypeName() >
 	</#switch>
 
 	<#return value >
@@ -42,7 +44,6 @@ import com.fasterxml.jackson.core.JsonParser;
 <#-- *********************************************************************************************** -->
 <#-- *********************************************************************************************** -->
 <#function jsonSerializeType member >
-
 	<#assign value = "unknown" >
 	<#switch member.getTypeName()>
 		<#case "void">
@@ -86,116 +87,28 @@ import com.fasterxml.jackson.core.JsonParser;
 <#function javaType member >
 	<#assign value = javaTypeNoArray( member ) >
 	<#if member.isArray() >
-		<#return "List<" + value + ">" >
+		<#return "java.util.List<" + value + ">" >
 	<#else>
 		<#return value >
 	</#if>
 </#function>
 
+<#-- *********************************************************************************************** -->
+<#-- function to get b -->
+<#-- *********************************************************************************************** -->
 <#function baseType object >
+	<#assign javaPackage = getJavaPackage() >
 	<#if object.getBaseTypeName()?? >
-		<#return "extends " + object.getBaseTypeName() >
+		<#return "extends " + javaPackage + "." + object.getBaseTypeName() >
 	<#else>
 		<#if object.getType() == "exception" >
-			<#return "extends JsonSerializableException">
+			<#return "extends com.amitapi.json.runtime.__JsonSerializableException">
 		<#else>
-			<#return "implements JsonSerializable">
+			<#return "extends com.amitapi.json.runtime.__JsonSerializableType">
 		</#if>
 	</#if>
 </#function>
 
-<#-- *********************************************************************************************** -->
-<#-- generates a class factory -->
-<#-- *********************************************************************************************** -->
-<#macro classFactory name children=[] >
-	/**
-	 * ${name} factory
-	 * !!! only for internal use
-	 */
-	public static final JsonSerializableFactory FACTORY = new JsonSerializableFactory() {
-		public String getName() { return "${name}"; }
-		public JsonSerializable create() { return new ${name}(); }
-	};
-
-<#if children?size !=0 >	
-	/**
-	 * ${name} factory map
-	 * !!! only for internal use
-	 */
-	public static JsonSerializableFactoryMap getFactoryMap() {
-		return OnDemandInit.FACTORYMAP;
-	}
-	private static class OnDemandInit {
-		private static final JsonSerializableFactoryMap FACTORYMAP = new JsonSerializableFactoryMap()
-<#list  children as childTypeName >
-			.with( ${childTypeName}.FACTORY )
-</#list>	
-			.with( ${name}.FACTORY );
-	}
-<#else>
-	/**
-	 * ${name} factory map
-	 * !!! only for internal use
-	 */
-	public static JsonSerializableFactoryMap getFactoryMap() {
-		return null;
-	}
-</#if>
-</#macro>
-
-
-<#-- *********************************************************************************************** -->
-<#-- generates a parseToken function                                                                 -->
-<#-- *********************************************************************************************** -->
-<#macro parseTokenFunction items hasBaseType >
-	/**
-	 * {@inheritDoc}
-	 * !!! only for internal use
-	 */	
-	@Override
-	public boolean parseToken( JsonParser jp, String fieldName ) throws IOException {
-<#if hasBaseType >
-		if( super.parseToken( jp, fieldName ) ) {
-			return true;
-		}
-</#if>
-<#list items as item >
-	<#assign stype = jsonSerializeType( item ) >
-	<#assign name = item.getName() >
-	<#assign type = item.getTypeName() >
-	<#assign noarrayjtype = javaTypeNoArray( item ) >
-	<#if item.isArray() >
-		if( fieldName.equals( "${name}s" ) ) {
-		<#if project.isPrimitiveType( type ) >
-			${name} = AmitJsonSerialize.read${stype}( jp, fieldName, ${name} );
-		<#elseif project.isEnumType( type ) >
-			${name} = AmitJsonSerialize.read${stype}( jp, fieldName, ${name}, ${noarrayjtype}.values() );
-		<#else>
-			if( ${name} == null ) {
-				${name} = new ArrayList<${noarrayjtype}>();
-			}
-			AmitJsonSerialize.readJsonSerializable( 
-					jp, fieldName, ${noarrayjtype}.getFactoryMap(), ${noarrayjtype}.FACTORY, ${name} );
-		</#if>
-			return true;
-		}
-	<#else>
-		if( fieldName.equals( "${name}" ) ) {
-		<#if project.isPrimitiveType( type ) >
-			${name} = AmitJsonSerialize.read${stype}( jp, fieldName );
-		<#elseif project.isEnumType( type ) >
-			${name} = AmitJsonSerialize.read${stype}( jp, fieldName, ${type}.values() );
-		<#else>
-			${name} = (${type})AmitJsonSerialize.
-				readJsonSerializable( jp, fieldName, ${type}.getFactoryMap(), ${type}.FACTORY );
-		</#if>
-			return true;
-		} <#if item_has_next> else</#if> 
-	</#if>
-</#list>
-		return false;
-	}
-</#macro>
 <#-- *********************************************************************************************** -->
 <#-- generates class members                                                                         -->
 <#-- *********************************************************************************************** -->
@@ -203,7 +116,7 @@ import com.fasterxml.jackson.core.JsonParser;
 <#list items as item >
 	<#assign jtype = javaType( item ) >
 	<#assign name = item.getName() >	
-	private ${jtype} ${name};
+	private ${jtype} __${name};
 </#list>
 </#macro>
 
@@ -219,27 +132,27 @@ import com.fasterxml.jackson.core.JsonParser;
 	
 	<#if item.isArray() >
 	public ${jtype} get${Aname}List() {
-		return ${name};
+		return this.__${name};
 	}
-	public void set${Aname}List( ${jtype} ${name} ) {
-		this.${name} = ${name};
+	public void set${Aname}List( ${jtype} value ) {
+		this.__${name} = value;
 	}
-	public ${className} with${Aname}( ${noarrayjtype} ${name} ) {
-		if( this.${name} == null ) {
-			this.${name} = new ArrayList<${noarrayjtype}>();
+	public ${className} with${Aname}( ${noarrayjtype} value ) {
+		if( this.__${name} == null ) {
+			this.__${name} = new java.util.ArrayList<${noarrayjtype}>();
 		}
-		this.${name}.add( ${name} );
+		this.__${name}.add( value );
 		return this;	
 	}
 	<#else>
 	public ${jtype} get${Aname}() {
-		return ${name};
+		return __${name};
 	}
-	public void set${Aname}( ${jtype} ${name} ) {
-		this.${name} = ${name};
+	public void set${Aname}( ${jtype} value ) {
+		this.__${name} = value;
 	}
-	public ${className} with${Aname}( ${jtype} ${name} ) {
-		this.${name} = ${name};
+	public ${className} with${Aname}( ${jtype} value ) {
+		this.__${name} = value;
 		return this;	
 	}		
 	</#if>
@@ -255,13 +168,13 @@ import com.fasterxml.jackson.core.JsonParser;
 <#if items?size == 0 >
 		return 0;
 <#else>
-		return Objects.hash(
+		return java.util.Objects.hash(
 	<#if hasBaseType >
 			super.hashCode()<#if items?size != 0 >,</#if>
 	</#if>	
 <#list items as item >
 	<#assign name = item.getName() >	
-			${name}<#if item_has_next>,</#if>
+			this.__${name}<#if item_has_next>,</#if>
 </#list>	
 		);
 </#if>		
@@ -273,7 +186,7 @@ import com.fasterxml.jackson.core.JsonParser;
 <#-- *********************************************************************************************** -->
 <#macro equalsFunction items hasBaseType className >
 	@Override
-	public boolean equals( Object obj ) {
+	public boolean equals( java.lang.Object obj ) {
 		if( obj == null ) return false;
 		if( !( obj instanceof ${className} ) ) return false;
 <#if hasBaseType >
@@ -286,7 +199,7 @@ import com.fasterxml.jackson.core.JsonParser;
 		return 
 <#list items as item >
 	<#assign name = item.getName() >	
-			Objects.equals( this.${name}, other.${name} ) <#if item_has_next>&&</#if>
+			java.util.Objects.equals( this.__${name}, other.__${name} ) <#if item_has_next>&&</#if>
 </#list>	
 		;
 </#if>		
@@ -299,7 +212,7 @@ import com.fasterxml.jackson.core.JsonParser;
 <#macro toStringFunction items hasBaseType className >
 	@Override
 	public String toString() {
-		StringBuffer sb = new StringBuffer();
+		java.lang.StringBuffer sb = new java.lang.StringBuffer();
 		sb.append( "${className} [" );
 		toString( sb );
 		sb.append( "]" );
@@ -309,13 +222,13 @@ import com.fasterxml.jackson.core.JsonParser;
 <#if hasBaseType >
 	@Override	
 </#if>	
-	protected void toString( StringBuffer sb ) { 
+	protected void toString( java.lang.StringBuffer sb ) { 
 <#if hasBaseType >
 		super.toString( sb );
 </#if>	
 <#list items as item >
 	<#assign name = item.getName() >	
-		sb.append( "${name}" ); sb.append( "=" ); sb.append( ${name} );<#if item_has_next>sb.append( "," );</#if>
+		sb.append( "${name}" ); sb.append( "=" ); sb.append( this.__${name} );<#if item_has_next>sb.append( "," );</#if>
 </#list>
 	}
 </#macro>
@@ -330,22 +243,133 @@ import com.fasterxml.jackson.core.JsonParser;
 <#if hasBaseType >
 	@Override
 </#if>	
-	public void serialize( JsonGenerator jg ) throws IOException {
+	public void __serialize( com.fasterxml.jackson.core.JsonGenerator jg ) throws java.io.IOException {
 		jg.writeStartObject();
-		jg.writeFieldName( AmitJsonSerialize.typeFieldName );
+		jg.writeFieldName( com.amitapi.json.runtime.__AmitJsonSerialize.typeFieldName );
 		jg.writeString( "${className}" );
-		serializeMembers( jg );
+		__serializeMembers( jg );
 		jg.writeEndObject();
 	}
 
 	/**
 	 * deserialize an object of instance of ${className}
 	 */
-	public static ${className} deserialize( JsonParser jp ) throws IOException {
+	public static ${className} __deserialize( com.fasterxml.jackson.core.JsonParser jp ) throws java.io.IOException {
 		jp.nextToken();
-		return (${className})AmitJsonSerialize.
-				readJsonSerializable( jp, "<root>",${className}.getFactoryMap(), ${className}.FACTORY );
+		return (${className})com.amitapi.json.runtime.__AmitJsonSerialize.
+				readJsonSerializable( jp, "<root>",${className}.__getFactoryMap(), ${className}.__getFactory() );
 	}	
+</#macro>
+
+<#-- *********************************************************************************************** -->
+<#-- generates a class factory -->
+<#-- *********************************************************************************************** -->
+<#macro classFactory name children=[] >
+<#assign javaPackage = getJavaPackage() >
+	/**
+	 * !!! only for internal use
+	 */
+	public static com.amitapi.json.runtime.__JsonSerializableFactory __getFactory() {
+		return OnDemandInit1.FACTORY;
+	}
+	private static class OnDemandInit1 {
+		public static final com.amitapi.json.runtime.__JsonSerializableFactory FACTORY = 
+				new com.amitapi.json.runtime.__JsonSerializableFactory() {
+					public java.lang.String getName() { return "${name}"; }
+					public com.amitapi.json.runtime.__JsonSerializable create() { return new ${name}(); }
+			};
+	}
+
+<#if children?size !=0 >	
+	/**
+	 * ${name} factory map
+	 * !!! only for internal use
+	 */
+	public static com.amitapi.json.runtime.__JsonSerializableFactoryMap __getFactoryMap() {
+		return OnDemandInit2.FACTORYMAP;
+	}
+	private static class OnDemandInit2 {
+		private static final com.amitapi.json.runtime.__JsonSerializableFactoryMap FACTORYMAP = 
+			new com.amitapi.json.runtime.__JsonSerializableFactoryMap()
+<#list  children as childTypeName >
+				.with( ${javaPackage}.${childTypeName}.__getFactory() )
+</#list>	
+				.with( ${name}.__getFactory() );
+	}
+<#else>
+	/**
+	 * ${name} factory map
+	 * !!! only for internal use
+	 */
+	public static com.amitapi.json.runtime.__JsonSerializableFactoryMap __getFactoryMap() {
+		return null;
+	}
+</#if>
+</#macro>
+
+
+<#-- *********************************************************************************************** -->
+<#-- generates a parseToken function                                                                 -->
+<#-- *********************************************************************************************** -->
+<#macro parseTokenFunction items hasBaseType >
+<#assign javaPackage = getJavaPackage() >
+	/**
+	 * {@inheritDoc}
+	 * !!! only for internal use
+	 */	
+	@Override
+	public boolean __parseToken( com.fasterxml.jackson.core.JsonParser jp, java.lang.String fieldName ) throws java.io.IOException {
+<#if hasBaseType >
+		if( super.__parseToken( jp, fieldName ) ) {
+			return true;
+		}
+</#if>
+<#list items as item >
+	<#assign stype = jsonSerializeType( item ) >
+	<#assign jtype = javaType( item ) >
+	<#assign name = item.getName() >
+	<#assign type = item.getTypeName() >
+	<#assign noarrayjtype = javaTypeNoArray( item ) >
+	<#if item.isArray() >
+		if( fieldName.equals( "${name}s" ) ) {
+		<#if project.isPrimitiveType( type ) >
+			this.__${name} = com.amitapi.json.runtime.__AmitJsonSerialize.
+				read${stype}( jp, fieldName, this.__${name} );
+		<#elseif project.isEnumType( type ) >
+			this.__${name} = com.amitapi.json.runtime.__AmitJsonSerialize.
+				read${stype}( jp, fieldName, this.__${name}, ${noarrayjtype}.values() );
+		<#else>
+			if( this.__${name} == null ) {
+				this.__${name} = new java.util.ArrayList<${noarrayjtype}>();
+			}
+			com.amitapi.json.runtime.__AmitJsonSerialize.readJsonSerializable( 
+					jp, fieldName,
+					${noarrayjtype}.__getFactoryMap(),
+					${noarrayjtype}.__getFactory(),
+					this.__${name} );
+		</#if>
+			return true;
+		}
+	<#else>
+		if( fieldName.equals( "${name}" ) ) {
+		<#if project.isPrimitiveType( type ) >
+			this.__${name} = com.amitapi.json.runtime.__AmitJsonSerialize.
+				read${stype}( jp, fieldName );
+		<#elseif project.isEnumType( type ) >
+			this.__${name} = com.amitapi.json.runtime.__AmitJsonSerialize.
+				read${stype}( jp, fieldName, ${jtype}.values() );
+		<#else>
+			this.__${name} = (${jtype})com.amitapi.json.runtime.__AmitJsonSerialize.
+				readJsonSerializable( jp, fieldName,
+						${jtype}.__getFactoryMap(),
+						${jtype}.__getFactory() );
+		</#if>
+			return true;
+		} <#if item_has_next> else</#if> 
+	</#if>
+</#list>
+		return false;
+	}
 </#macro>
 
 <#-- *********************************************************************************************** -->
@@ -356,17 +380,19 @@ import com.fasterxml.jackson.core.JsonParser;
 	 * {@inheritDoc}
 	 */	
 	@Override
-	public void serializeMembers( JsonGenerator jg ) throws IOException {
+	public void __serializeMembers( com.fasterxml.jackson.core.JsonGenerator jg ) throws java.io.IOException {
 <#if hasBaseType >
-		super.serializeMembers( jg );
+		super.__serializeMembers( jg );
 </#if>	
 <#list items as item >
 	<#assign stype = jsonSerializeType( item ) >
 	<#assign name = item.getName() >	
 	<#if item.isArray() >
-		AmitJsonSerialize.write${stype}( jg, "${name}s", ${name} );
+		com.amitapi.json.runtime.__AmitJsonSerialize.
+			write${stype}( jg, "${name}s", this.__${name} );
 	<#else>
-		AmitJsonSerialize.write${stype}( jg, "${name}", ${name} );
+		com.amitapi.json.runtime.__AmitJsonSerialize.
+			write${stype}( jg, "${name}", this.__${name} );
 	</#if>
 </#list>
 	}
@@ -375,10 +401,24 @@ import com.fasterxml.jackson.core.JsonParser;
 <#-- generates throws exceptions                                                           -->
 <#-- *********************************************************************************************** -->
 <#macro throwsExceptions items >
-<#if items?size != 0 >throws <#list items as item >${item}<#if item_has_next>, </#if></#list></#if></#macro>
+<#assign javaPackage = getJavaPackage() >
+<#if items?size != 0 >throws
+<#list items as item >
+		${javaPackage}.${item}<#if item_has_next>, <#else>;</#if>
+</#list>
+<#else>
+;
+</#if>
+</#macro>
 
 <#-- *********************************************************************************************** -->
 <#-- generates implements interfaces exceptions                                                           -->
 <#-- *********************************************************************************************** -->
 <#macro extendsInterfaces items >
-<#if items?size != 0 >extends <#list items as item >${item}<#if item_has_next>, </#if></#list> </#if></#macro>
+<#assign javaPackage = getJavaPackage() >
+<#if items?size != 0 >extends
+<#list items as item >
+		${javaPackage}.${item}<#if item_has_next>, </#if>
+</#list>
+</#if>						
+</#macro>
