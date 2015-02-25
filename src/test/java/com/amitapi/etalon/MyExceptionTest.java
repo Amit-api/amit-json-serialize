@@ -22,6 +22,10 @@ public class MyExceptionTest {
 			"{\"__type\":\"MyException\",\"theBoolen\":true,\"theInt\":10,\"theLong\":100," +
 			"\"theDouble\":2.3,\"theString\":\"Hello\",\"theDate\":\"2001-02-06T03:10:04\"," +
 			"\"theUiid\":\"f117adfb-6634-4ff9-bda6-dd1c8dca3380\"}";
+	private static String jsonWithMsg = 
+			"{\"__type\":\"MyException\",\"__msg\":\"some\",\"theBoolen\":true,\"theInt\":10,\"theLong\":100," +
+			"\"theDouble\":2.3,\"theString\":\"Hello\",\"theDate\":\"2001-02-06T03:10:04\"," +
+			"\"theUiid\":\"f117adfb-6634-4ff9-bda6-dd1c8dca3380\"}";
 
 	private static MyException orig = new MyException().
 		withTheBoolen( true ).
@@ -31,7 +35,16 @@ public class MyExceptionTest {
 		withTheString( "Hello" ).
 		withTheDate( dateTime ).
 		withTheUiid( uuid );
-	
+
+	private static MyException origWithMsg = new MyException( "some" ).
+		withTheBoolen( true ).
+		withTheInt( 10 ).
+		withTheLong( 100L ).
+		withTheDouble( 2.3 ).
+		withTheString( "Hello" ).
+		withTheDate( dateTime ).
+		withTheUiid( uuid );
+		
 	@Test
 	public void testSerializeJson() throws IOException {
 				
@@ -50,5 +63,26 @@ public class MyExceptionTest {
 		MyException obj = MyException.__deserialize( j );
 		
 		assertEquals( orig, obj );
+	}
+	
+	@Test
+	public void testSerializeJsonWithMsg() throws IOException {
+				
+		StringWriter writer = new StringWriter();
+		JsonGenerator j = jfactory.createGenerator( writer );
+		origWithMsg.__serialize( j );
+		j.close();
+		
+		assertEquals( jsonWithMsg, writer.toString() );
+	}
+	
+	@Test
+	public void testDeSerializeJsonWithMsg() throws IOException {
+		JsonParser j = jfactory.createParser( jsonWithMsg );
+		
+		MyException obj = MyException.__deserialize( j );
+		
+		assertEquals( origWithMsg, obj );
+		assertEquals( "some", obj.getMessage() );
 	}
 }

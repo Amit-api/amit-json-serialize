@@ -130,6 +130,9 @@
 	<#assign name = item.getName() >	
 	<#assign Aname = amit.AUpper( item.getName() ) >
 	
+	/**
+	 * property ${name}
+	 */
 	<#if item.isArray() >
 	public ${jtype} get${Aname}List() {
 		return this.__${name};
@@ -163,6 +166,9 @@
 <#-- generates hashCode function                                                                     -->
 <#-- *********************************************************************************************** -->
 <#macro hashCodeFunction items hasBaseType >
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public int hashCode() {
 <#if items?size == 0 >
@@ -185,6 +191,9 @@
 <#-- generates equals function                                                                       -->
 <#-- *********************************************************************************************** -->
 <#macro equalsFunction items hasBaseType className >
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean equals( java.lang.Object obj ) {
 		if( obj == null ) return false;
@@ -210,6 +219,9 @@
 <#-- generates toString function                                                                     -->
 <#-- *********************************************************************************************** -->
 <#macro toStringFunction items hasBaseType className >
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String toString() {
 		java.lang.StringBuffer sb = new java.lang.StringBuffer();
@@ -244,20 +256,16 @@
 	@Override
 </#if>	
 	public void __serialize( com.fasterxml.jackson.core.JsonGenerator jg ) throws java.io.IOException {
-		jg.writeStartObject();
-		jg.writeFieldName( com.amitapi.json.runtime.__AmitJsonSerialize.typeFieldName );
-		jg.writeString( "${className}" );
-		__serializeMembers( jg );
-		jg.writeEndObject();
+		com.amitapi.json.runtime.__AmitJsonSerialize.
+			writeObject( jg, "${className}", this );
 	}
 
 	/**
 	 * deserialize an object of instance of ${className}
 	 */
 	public static ${className} __deserialize( com.fasterxml.jackson.core.JsonParser jp ) throws java.io.IOException {
-		jp.nextToken();
 		return (${className})com.amitapi.json.runtime.__AmitJsonSerialize.
-				readJsonSerializable( jp, "<root>",${className}.__getFactoryMap(), ${className}.__getFactory() );
+			readObject(jp, __getFactoryMap(), __getFactory() );
 	}	
 </#macro>
 
@@ -282,7 +290,6 @@
 
 <#if children?size !=0 >	
 	/**
-	 * ${name} factory map
 	 * !!! only for internal use
 	 */
 	public static com.amitapi.json.runtime.__JsonSerializableFactoryMap __getFactoryMap() {
@@ -298,7 +305,6 @@
 	}
 <#else>
 	/**
-	 * ${name} factory map
 	 * !!! only for internal use
 	 */
 	public static com.amitapi.json.runtime.__JsonSerializableFactoryMap __getFactoryMap() {
@@ -315,7 +321,6 @@
 <#assign javaPackage = getJavaPackage() >
 	/**
 	 * {@inheritDoc}
-	 * !!! only for internal use
 	 */	
 	@Override
 	public boolean __parseToken( com.fasterxml.jackson.core.JsonParser jp, java.lang.String fieldName ) throws java.io.IOException {

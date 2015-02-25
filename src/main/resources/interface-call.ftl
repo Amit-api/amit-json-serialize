@@ -74,6 +74,10 @@ public static final class ${APfname} extends ${runtimeJavaPackage}.__JsonSeriali
 	}
 </#if>	
 
+	public void setException( ${runtimeJavaPackage}.AmitRuntimeException exception ) {
+		this.exception = exception;
+	}
+	
 <#list exceptions as exception >
 	public void setException( ${modelJavaPackage}.${exception} exception ) {
 		this.exception = exception;
@@ -89,42 +93,52 @@ public static final class ${APfname} extends ${runtimeJavaPackage}.__JsonSeriali
 
 	@Override
 	public void __serialize( com.fasterxml.jackson.core.JsonGenerator jg ) throws java.io.IOException {
-<#if returnTypeName != "void" >
-		if( returnValue != null ) {		
-			com.amitapi.json.runtime.__AmitJsonSerialize.
-				writeJsonSerializable( jg, null, returnValue );
-		}
-</#if>
 		if( exception != null ) {
 			exception.__serialize( jg );
+			return;
 		}
+<#if returnTypeName != "void" >
+
+		if( returnValue != null ) {		
+			${runtimeJavaPackage}.__AmitJsonSerialize.
+				writeJsonSerializable( jg, null, returnValue );
+			
+		}
+</#if>
 	}
 	
 	public static ${APfname} __deserialize( com.fasterxml.jackson.core.JsonParser jp ) throws java.io.IOException {
 		${APfname} result = new ${APfname}();
 		jp.nextToken();
-<#if returnTypeName != "void">
-	<#if returnTypeIsArray >
+		
+<#if returnTypeName == "void" >
+		if( jp.getCurrentToken() == null ) {
+			return result;
+		}
+		
+		result.exception = (${runtimeJavaPackage}.__JsonSerializableException) ${runtimeJavaPackage}.
+			__AmitJsonSerialize.readJsonSerializable( jp,"<*>", __getFactoryMap(), null );
+<#else>
+		<#if returnTypeIsArray >
 		if( jp.isExpectedStartArrayToken() ) {
 			if( result.returnValue == null ) {
 				result.returnValue = new java.util.ArrayList<${returnTypeNoArray}>();
 			}
 			${runtimeJavaPackage}.__AmitJsonSerialize.readJsonSerializable(
-					jp, "<root>", null, ${returnTypeNoArray}.__getFactory(), result.returnValue );
-			return result;
+					jp, "<*>", ${returnTypeNoArray}.__getFactoryMap(), ${returnTypeNoArray}.__getFactory(), result.returnValue );			
+		} else {
+			result.exception = (${runtimeJavaPackage}.__JsonSerializableException) ${runtimeJavaPackage}.
+					__AmitJsonSerialize.readJsonSerializable( jp,"<*>", __getFactoryMap(), null );			
 		}
-	</#if>
-	
-		${runtimeJavaPackage}.__JsonSerializable object = ${runtimeJavaPackage}.__AmitJsonSerialize.
-			readJsonSerializable( jp, "<root>", __getFactoryMap(), ${returnTypeNoArray}.__getFactory() );
-<#--	
-	if( object instanceof ${returnTypeNoArray} ) {
-		result.returnValue = (${returnTypeNoArray})object;
-	} else {
-		result.exception = (${runtimeJavaPackage}.__JsonSerializableException)object;
-	} -->
-<#else>
-	
+		<#else>
+			${runtimeJavaPackage}.__JsonSerializable object = ${runtimeJavaPackage}.__AmitJsonSerialize.
+				readJsonSerializable( jp, "<*>", __getFactoryMap(), ${returnTypeNoArray}.__getFactory() );
+			if( object.__isExceptionType()  ) {
+				result.exception = (${runtimeJavaPackage}.__JsonSerializableException)object;
+			} else {
+				result.returnValue = (${returnTypeNoArray})object;
+			}
+		</#if>
 </#if>
 		return result;
 }	
@@ -141,6 +155,10 @@ public static final class ${APfname} extends ${runtimeJavaPackage}.__JsonSeriali
 <#list allExceptions as ex >
 			.with( ${modelJavaPackage}.${ex}.__getFactory() )
 </#list>
+			.with( ${runtimeJavaPackage}.AmitInternalErrorException.__getFactory() )
+			.with( ${runtimeJavaPackage}.AmitInvalidRequestException.__getFactory() )
+			.with( ${runtimeJavaPackage}.AmitInvalidResponseException.__getFactory() )
+			.with( ${runtimeJavaPackage}.AmitRuntimeException.__getFactory() )
 <#if returnTypeName != "void" >
 	<#if !returnTypeIsArray >
 			.with( ${returnTypeNoArray}.__getFactory() )

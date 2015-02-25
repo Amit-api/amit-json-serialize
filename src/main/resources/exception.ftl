@@ -12,6 +12,13 @@ package ${attrJavaPackage};
  */
 public class ${objectName} ${my.baseType( object )} {
 	private static final long serialVersionUID = 1L;
+	
+	public ${objectName}() {
+	}
+	
+	public ${objectName}( java.lang.String message ) {
+		super( message );
+	}
 
 <@my.classMembers items=object.getMembers() />
 <@my.classGettersSetters items=object.getMembers() className=objectName />
@@ -20,13 +27,13 @@ public class ${objectName} ${my.baseType( object )} {
 
 <@my.equalsFunction items=object.getMembers() className=objectName hasBaseType=object.getBaseTypeName()?? />
 
-<@my.toStringFunction items=object.getMembers() className=objectName hasBaseType=object.getBaseTypeName()?? />
+<@my.toStringFunction items=object.getMembers() className=objectName hasBaseType=true />
 
 <@my.serializeFuctions className=objectName />
 
-<@my.serializeMembersFunction items=object.getMembers() hasBaseType=object.getBaseTypeName()?? />
+<@my.serializeMembersFunction items=object.getMembers() hasBaseType=true />
 		
-<@my.parseTokenFunction items=object.getMembers() hasBaseType=object.getBaseTypeName()?? />
+<@my.parseTokenFunction items=object.getMembers() hasBaseType=true />
 	
 <@my.classFactory name=objectName children=project.getExceptionTypeChildren( objectName ) />
 }
