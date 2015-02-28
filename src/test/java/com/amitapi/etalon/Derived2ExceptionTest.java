@@ -6,8 +6,6 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-import com.amitapi.TestBase;
-
 public class Derived2ExceptionTest extends TestBase {
 
 	private static final String json =  

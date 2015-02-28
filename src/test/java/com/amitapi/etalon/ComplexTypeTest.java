@@ -6,8 +6,6 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-import com.amitapi.TestBase;
-
 public class ComplexTypeTest extends TestBase {
 	private static final String json =  
 			"{\"__type\":\"ComplexType\",\"base\":" +

@@ -7,10 +7,10 @@ import java.util.ArrayList;
 
 import org.junit.Test;
 
-import com.amitapi.TestBase;
 import com.amitapi.etalon.BaseException;
 import com.amitapi.etalon.MyArrayException;
 import com.amitapi.etalon.PrimitiveTypes;
+import com.amitapi.etalon.TestBase;
 
 public class GetAllTypesResponseTest extends TestBase {
 

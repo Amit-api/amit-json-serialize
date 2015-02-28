@@ -8,8 +8,6 @@ import java.util.UUID;
 
 import org.junit.Test;
 
-import com.amitapi.TestBase;
-
 public class PrimitiveTypeTest extends TestBase {
 	private static LocalDateTime dateTime = LocalDateTime.of( 2001, 2, 6, 3, 10, 4 );
 	private static UUID uuid = UUID.fromString( "f117adfb-6634-4ff9-bda6-dd1c8dca3380" );

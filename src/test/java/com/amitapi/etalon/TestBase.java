@@ -1,4 +1,4 @@
-package com.amitapi;
+package com.amitapi.etalon;
 
 import java.io.IOException;
 import java.io.StringWriter;

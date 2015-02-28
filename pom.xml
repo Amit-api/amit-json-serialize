@@ -35,7 +35,6 @@
 
 	<build>
 		<plugins>
-
 			<plugin>
 				<groupId>com.amitapi</groupId>
 				<artifactId>amit-maven-plugin</artifactId>
@@ -43,8 +42,9 @@
 				<executions>
 					<execution>
 						<configuration>
+							<templateJarClass>com.amit.api.templates.Location</templateJarClass>
+							<templateName>json-model</templateName>						
 							<compileFile>amit-etalon.amit</compileFile>
-							<templateUrl>src/main/resources/json-model</templateUrl>
 							<outputDirectory>src/main/tmp</outputDirectory>
 						</configuration>
 						<goals>
@@ -52,6 +52,13 @@
 						</goals>
 					</execution>
 				</executions>
+				<dependencies>
+					<dependency>
+						<groupId>com.amitapi</groupId>
+						<artifactId>amit-templates</artifactId>
+						<version>0.0.1-SNAPSHOT</version>
+					</dependency>
+				</dependencies>				
 			</plugin>
 		</plugins>
 	</build>

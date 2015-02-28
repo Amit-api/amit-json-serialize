@@ -6,7 +6,7 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-import com.amitapi.TestBase;
+import com.amitapi.etalon.TestBase;
 import com.amitapi.json.runtime.AmitInternalErrorException;
 import com.amitapi.json.runtime.AmitInvalidRequestException;
 import com.amitapi.json.runtime.AmitInvalidResponseException;

@@ -8,8 +8,6 @@ import java.util.UUID;
 
 import org.junit.Test;
 
-import com.amitapi.TestBase;
-
 public class MyExceptionTest extends TestBase {
 	
 	private static LocalDateTime dateTime = LocalDateTime.of( 2001, 2, 6, 3, 10, 4 );

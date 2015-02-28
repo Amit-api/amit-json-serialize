@@ -6,8 +6,6 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-import com.amitapi.TestBase;
-
 public class EnumsTest extends TestBase {
 	private static final Enums orig = new Enums().
 			withE1( IntEnum.SECOND ).

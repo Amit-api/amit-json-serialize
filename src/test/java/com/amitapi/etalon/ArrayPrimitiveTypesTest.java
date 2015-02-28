@@ -7,7 +7,6 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.junit.Test;
-import com.amitapi.TestBase;
 
 public class ArrayPrimitiveTypesTest extends TestBase {
 	private static LocalDateTime dateTime = LocalDateTime.of( 2001, 2, 6, 3, 10, 4 );
