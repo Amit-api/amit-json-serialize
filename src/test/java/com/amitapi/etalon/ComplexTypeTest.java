@@ -3,16 +3,12 @@ package com.amitapi.etalon;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
-import java.io.StringWriter;
 
 import org.junit.Test;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
+import com.amitapi.TestBase;
 
-public class ComplexTypeTest {
-	private static final JsonFactory jfactory = new JsonFactory();
+public class ComplexTypeTest extends TestBase {
 	private static final String json =  
 			"{\"__type\":\"ComplexType\",\"base\":" +
 					"{\"__type\":\"Derived2\",\"v1\":1,\"v2\":2}," + 
@@ -23,20 +19,12 @@ public class ComplexTypeTest {
 			withMoreBase( new Derived1().withV2( 3 ).withV1( 4 ) );
 	@Test
 	public void testSerialize() throws IOException {			
-		StringWriter writer = new StringWriter();
-		JsonGenerator j = jfactory.createGenerator( writer );
-		orig.__serialize( j );
-		j.close();
-		
-		assertEquals( json, writer.toString() );
+		assertEquals( json, serialize( orig ) );
 	}
 	
 	@Test
 	public void testDeSerialize() throws IOException {
-		JsonParser j = jfactory.createParser( json );
-		
-		ComplexType obj = ComplexType.__deserialize( j );
-		
+		ComplexType obj = ComplexType.__deserialize( parser( json ) );	
 		assertEquals( orig, obj );
 	}	
 }

@@ -3,16 +3,12 @@ package com.amitapi.etalon;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
-import java.io.StringWriter;
 
 import org.junit.Test;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
+import com.amitapi.TestBase;
 
-public class EnumsTest {
-	private static final JsonFactory jfactory = new JsonFactory();
+public class EnumsTest extends TestBase {
 	private static final Enums orig = new Enums().
 			withE1( IntEnum.SECOND ).
 			withE2( IntEnum.THIRD ).withE2( IntEnum.FIRST ).
@@ -26,21 +22,12 @@ public class EnumsTest {
 	
 	@Test
 	public void testSerialize() throws IOException {
-		StringWriter writer = new StringWriter();
-		JsonGenerator j = jfactory.createGenerator( writer );
-		
-		orig.__serialize( j );
-		j.close();
-		
-		assertEquals( json, writer.toString() );	
+		assertEquals( json, serialize( orig ) );	
 	}
 
 	@Test
 	public void testDeSerialize() throws IOException {
-		JsonParser j = jfactory.createParser( json );
-		
-		Enums obj = Enums.__deserialize( j );
-		
+		Enums obj = Enums.__deserialize( parser( json ) );
 		assertEquals( orig, obj );
 	}	
 	

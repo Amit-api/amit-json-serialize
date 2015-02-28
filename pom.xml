@@ -44,7 +44,7 @@
 					<execution>
 						<configuration>
 							<compileFile>amit-etalon.amit</compileFile>
-							<templateUrl>src/main/resources</templateUrl>
+							<templateUrl>src/main/resources/json-model</templateUrl>
 							<outputDirectory>src/main/tmp</outputDirectory>
 						</configuration>
 						<goals>

@@ -23,9 +23,9 @@ public class ${objectName} ${my.baseType( object )} {
 <@my.classMembers items=object.getMembers() />
 <@my.classGettersSetters items=object.getMembers() className=objectName />
 
-<@my.hashCodeFunction items=object.getMembers() hasBaseType=object.getBaseTypeName()?? />
+<@my.hashCodeFunction items=object.getMembers() hasBaseType=true />
 
-<@my.equalsFunction items=object.getMembers() className=objectName hasBaseType=object.getBaseTypeName()?? />
+<@my.equalsFunction items=object.getMembers() className=objectName hasBaseType=true />
 
 <@my.toStringFunction items=object.getMembers() className=objectName hasBaseType=true />
 

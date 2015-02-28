@@ -72,15 +72,33 @@ public static final class ${APfname} extends ${runtimeJavaPackage}.__JsonSeriali
 	public ${returnType} getReturnValue() {
 		return returnValue;
 	}
-</#if>	
+	
+	/**
+	 * sets return value
+	 */
+	public ${APfname} withReturnValue( ${returnType} returnValue ) {
+		this.returnValue = returnValue;
+		return this;	
+	}
+</#if>
 
 	public void setException( ${runtimeJavaPackage}.AmitRuntimeException exception ) {
 		this.exception = exception;
 	}
 	
+	public ${APfname} withException( ${runtimeJavaPackage}.AmitRuntimeException exception ) {
+		this.exception = exception;
+		return this;
+	}
+	
 <#list exceptions as exception >
 	public void setException( ${modelJavaPackage}.${exception} exception ) {
 		this.exception = exception;
+	}
+	
+	public ${APfname} withException( ${modelJavaPackage}.${exception} exception ) {
+		this.exception = exception;
+		return this;
 	}
 	
 </#list>	
@@ -111,10 +129,11 @@ public static final class ${APfname} extends ${runtimeJavaPackage}.__JsonSeriali
 		${APfname} result = new ${APfname}();
 		jp.nextToken();
 		
-<#if returnTypeName == "void" >
 		if( jp.getCurrentToken() == null ) {
 			return result;
 		}
+
+<#if returnTypeName == "void" >
 		
 		result.exception = (${runtimeJavaPackage}.__JsonSerializableException) ${runtimeJavaPackage}.
 			__AmitJsonSerialize.readJsonSerializable( jp,"<*>", __getFactoryMap(), null );
@@ -131,13 +150,13 @@ public static final class ${APfname} extends ${runtimeJavaPackage}.__JsonSeriali
 					__AmitJsonSerialize.readJsonSerializable( jp,"<*>", __getFactoryMap(), null );			
 		}
 		<#else>
-			${runtimeJavaPackage}.__JsonSerializable object = ${runtimeJavaPackage}.__AmitJsonSerialize.
-				readJsonSerializable( jp, "<*>", __getFactoryMap(), ${returnTypeNoArray}.__getFactory() );
-			if( object.__isExceptionType()  ) {
-				result.exception = (${runtimeJavaPackage}.__JsonSerializableException)object;
-			} else {
-				result.returnValue = (${returnTypeNoArray})object;
-			}
+		${runtimeJavaPackage}.__JsonSerializable object = ${runtimeJavaPackage}.__AmitJsonSerialize.
+			readJsonSerializable( jp, "<*>", __getFactoryMap(), ${returnTypeNoArray}.__getFactory() );
+		if( object.__isExceptionType()  ) {
+			result.exception = (${runtimeJavaPackage}.__JsonSerializableException)object;
+		} else {
+			result.returnValue = (${returnTypeNoArray})object;
+		}
 		</#if>
 </#if>
 		return result;

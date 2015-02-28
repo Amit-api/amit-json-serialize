@@ -237,10 +237,11 @@
 	protected void toString( java.lang.StringBuffer sb ) { 
 <#if hasBaseType >
 		super.toString( sb );
-</#if>	
+		sb.append(",");
+</#if>
 <#list items as item >
 	<#assign name = item.getName() >	
-		sb.append( "${name}" ); sb.append( "=" ); sb.append( this.__${name} );<#if item_has_next>sb.append( "," );</#if>
+		sb.append( "${name}" ).append( "=" ).append( this.__${name} )<#if item_has_next>.append( "," )</#if>;
 </#list>
 	}
 </#macro>
