@@ -53,13 +53,13 @@ public class PrimitiveTypeTest extends TestBase {
 
 	@Test(expected = JsonParseException.class)
 	public void testRead_badBoolean() throws IOException {
-		JsonParser jp = parser("{\"theBoolen\":1");
+		JsonParser jp = parser("{\"theBoolen\":1}");
 		PrimitiveTypesSerializer.readDynamic(jp);
 	}
 	
 	@Test 
 	public void testRead_nullValue() throws IOException {		
-		JsonParser jp = parser("{\"theBoolen\":null");
+		JsonParser jp = parser("{\"theBoolen\":null}");
 		PrimitiveTypes r = PrimitiveTypesSerializer.readDynamic(jp);
 		assertNull(r.getTheBoolen());
 		jp.close();
