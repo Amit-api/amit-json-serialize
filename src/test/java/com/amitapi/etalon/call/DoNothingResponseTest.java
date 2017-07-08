@@ -7,14 +7,10 @@ import java.io.IOException;
 import org.junit.Test;
 
 import com.amitapi.etalon.TestBase;
-import com.amitapi.json.runtime.AmitInternalErrorException;
-import com.amitapi.json.runtime.AmitInvalidRequestException;
-import com.amitapi.json.runtime.AmitInvalidResponseException;
-import com.amitapi.json.runtime.AmitRuntimeException;
-import com.fasterxml.jackson.core.JsonParseException;
 
 public class DoNothingResponseTest extends TestBase {
 
+	/*
 	@Test
 	public void test_DS_Empty() throws JsonParseException, IOException {
 		CallAllInt.DoNothingResponse resp = CallAllInt.DoNothingResponse.__deserialize( 
@@ -108,5 +104,5 @@ public class DoNothingResponseTest extends TestBase {
 		assertEquals( "{\"__type\":\"exception\",\"__msg\":\"error\"}", 
 				serialize( new CallAllInt.DoNothingResponse().
 						withException( new AmitRuntimeException( "error") ) ));		
-	}
+	}*/
 }

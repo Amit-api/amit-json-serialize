@@ -1,0 +1,39 @@
+Start generate ...
+
+done: generated: PrimitiveTypes, file: com\amitapi\etalon/PrimitiveTypes.java
+done: generated: ArrayPrimitiveTypes, file: com\amitapi\etalon/ArrayPrimitiveTypes.java
+done: generated: MapPrimitiveTypes, file: com\amitapi\etalon/MapPrimitiveTypes.java
+done: generated: Enums, file: com\amitapi\etalon/Enums.java
+done: generated: Base, file: com\amitapi\etalon/Base.java
+done: generated: Derived1, file: com\amitapi\etalon/Derived1.java
+done: generated: Derived2, file: com\amitapi\etalon/Derived2.java
+done: generated: ComplexType, file: com\amitapi\etalon/ComplexType.java
+done: generated: CustomType, file: com\amitapi\etalon/CustomType.java
+done: generated: SimpleType, file: com\amitapi\etalon/SimpleType.java
+
+done: generated: PrimitiveTypes, file: com\amitapi\etalon/json/PrimitiveTypesSerializer.java
+done: generated: ArrayPrimitiveTypes, file: com\amitapi\etalon/json/ArrayPrimitiveTypesSerializer.java
+done: generated: MapPrimitiveTypes, file: com\amitapi\etalon/json/MapPrimitiveTypesSerializer.java
+done: generated: Enums, file: com\amitapi\etalon/json/EnumsSerializer.java
+done: generated: Base, file: com\amitapi\etalon/json/BaseSerializer.java
+done: generated: Derived1, file: com\amitapi\etalon/json/Derived1Serializer.java
+done: generated: Derived2, file: com\amitapi\etalon/json/Derived2Serializer.java
+done: generated: ComplexType, file: com\amitapi\etalon/json/ComplexTypeSerializer.java
+done: generated: CustomType, file: com\amitapi\etalon/json/CustomTypeSerializer.java
+done: generated: SimpleType, file: com\amitapi\etalon/json/SimpleTypeSerializer.java
+
+done: com\amitapi\etalon/u/Lib.java
+
+done: generated: IntEnum, file: com\amitapi\etalon/IntEnum.java
+done: generated: StringEnum, file: com\amitapi\etalon/StringEnum.java
+done: generated: MixedEnum, file: com\amitapi\etalon/MixedEnum.java
+done: generated: IntEnum, file: com\amitapi\etalon/json/IntEnumSerializer.java
+done: generated: StringEnum, file: com\amitapi\etalon/json/StringEnumSerializer.java
+done: generated: MixedEnum, file: com\amitapi\etalon/json/MixedEnumSerializer.java
+
+done: generated: MyException, file: com\amitapi\etalon/MyException.java
+done: generated: MyArrayException, file: com\amitapi\etalon/MyArrayException.java
+done: generated: BaseException, file: com\amitapi\etalon/BaseException.java
+done: generated: Derived1Exception, file: com\amitapi\etalon/Derived1Exception.java
+done: generated: Derived2Exception, file: com\amitapi\etalon/Derived2Exception.java
+done: generated: ComplexTypeException, file: com\amitapi\etalon/ComplexTypeException.java

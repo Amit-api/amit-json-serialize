@@ -9,7 +9,7 @@ import java.util.UUID;
 import org.junit.Test;
 
 public class MyExceptionTest extends TestBase {
-	
+	/*
 	private static LocalDateTime dateTime = LocalDateTime.of( 2001, 2, 6, 3, 10, 4 );
 	private static UUID uuid = UUID.fromString( "f117adfb-6634-4ff9-bda6-dd1c8dca3380" );
 	private static String json = 
@@ -60,5 +60,5 @@ public class MyExceptionTest extends TestBase {
 		MyException obj = MyException.__deserialize( parser( jsonWithMsg ) );		
 		assertEquals( origWithMsg, obj );
 		assertEquals( "some", obj.getMessage() );
-	}
+	}*/
 }

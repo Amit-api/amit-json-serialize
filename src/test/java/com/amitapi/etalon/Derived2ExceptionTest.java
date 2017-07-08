@@ -7,7 +7,7 @@ import java.io.IOException;
 import org.junit.Test;
 
 public class Derived2ExceptionTest extends TestBase {
-
+/*
 	private static final String json =  
 			"{\"__type\":\"Derived2Exception\",\"v1\":1,\"v2\":2}";
 	private static final BaseException orig = new Derived2Exception().
@@ -23,5 +23,5 @@ public class Derived2ExceptionTest extends TestBase {
 		BaseException obj = BaseException.__deserialize( parser( json ) );		
 		assertEquals( orig, obj );
 	}	
-
+*/
 }

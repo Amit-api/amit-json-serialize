@@ -12,6 +12,7 @@ public class ComplexTypeExceptionTest extends TestBase {
 					"{\"__type\":\"Derived2\",\"v1\":1,\"v2\":2}," + 
 				"\"moreBases\":" +
 					"[{\"__type\":\"Derived1\",\"v1\":4,\"v2\":3}]}";
+	/*
 	private static final ComplexTypeException orig = new ComplexTypeException().
 			withBase( new Derived2().withV2( 2 ).withV1( 1 )  ).
 			withMoreBase( new Derived1().withV2( 3 ).withV1( 4 ) );
@@ -24,5 +25,5 @@ public class ComplexTypeExceptionTest extends TestBase {
 	public void testDeSerialize() throws IOException {
 		ComplexTypeException obj = ComplexTypeException.__deserialize( parser( json ) );
 		assertEquals( orig, obj );
-	}	
+	}*/	
 }

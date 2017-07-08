@@ -17,6 +17,12 @@ enum StringEnum {
 	third = "th\"ird"
 }
 
+enum MixedEnum {
+	first = 1,
+	second = "2",
+	third = "third"
+}
+
 type PrimitiveTypes {
 	boolean theBoolen;
 	int theInt;
@@ -35,6 +41,16 @@ type ArrayPrimitiveTypes {
 	array string theString;
 	array datetime theDate;
 	array uuid theUiid;	
+}
+
+type MapPrimitiveTypes {
+	map boolean theBoolen;
+	map int theInt;
+	map long theLong;
+	map double theDouble;
+	map string theString;
+	map datetime theDate;
+	map uuid theUiid;	
 }
 
 type Enums {
@@ -59,6 +75,16 @@ type Derived2 : Base {
 type ComplexType {
 	Base base;
 	array Base moreBase;
+}
+
+type CustomType {
+	int v;
+}
+
+type SimpleType {
+	CustomType ctype;
+	array CustomType ctypes;
+	map CustomType mtypes;
 }
 
 exception MyException {

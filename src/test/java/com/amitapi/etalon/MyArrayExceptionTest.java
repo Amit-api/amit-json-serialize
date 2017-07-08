@@ -15,6 +15,7 @@ public class MyArrayExceptionTest extends TestBase {
 			"{\"__type\":\"MyArrayException\",\"theBoolens\":[true,false],\"theInts\":[10,12],\"theLongs\":[100]," +
 			"\"theDoubles\":[2.3],\"theStrings\":[\"Hello\"],\"theDates\":[\"2001-02-06T03:10:04\"]," +
 			"\"theUiids\":[\"f117adfb-6634-4ff9-bda6-dd1c8dca3380\"]}";		
+	/*
 	private static MyArrayException orig = new MyArrayException().
 			withTheBoolen( true ).
 			withTheBoolen( false ).
@@ -35,5 +36,5 @@ public class MyArrayExceptionTest extends TestBase {
 	public void testDeSerializeJson() throws IOException {
 		MyArrayException obj = MyArrayException.__deserialize( parser( json ) );		
 		assertEquals( orig, obj );
-	}
+	}*/
 }

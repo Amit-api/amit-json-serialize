@@ -7,13 +7,10 @@ import java.util.ArrayList;
 
 import org.junit.Test;
 
-import com.amitapi.etalon.BaseException;
-import com.amitapi.etalon.MyArrayException;
-import com.amitapi.etalon.PrimitiveTypes;
 import com.amitapi.etalon.TestBase;
 
 public class GetAllTypesResponseTest extends TestBase {
-
+/*
 	@Test
 	public void test_DS_Null() throws IOException {
 		CallInterfaceReturn.GetAllTypesResponse resp = CallInterfaceReturn.GetAllTypesResponse.__deserialize(
@@ -109,6 +106,6 @@ public class GetAllTypesResponseTest extends TestBase {
 				parser( "{\"__type\":\"MyArrayException\",\"__msg\":\"error\"}" ) );
 		
 		assertEquals( new MyArrayException( "error" ), resp.getException() );
-	}	
+	}	*/
 	
 }

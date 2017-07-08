@@ -23,13 +23,13 @@
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-core</artifactId>
-			<version>[2.5,)</version>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.7.0</version>
 		</dependency>
 		<dependency>
-			<groupId>com.amitapi</groupId>
-			<artifactId>amit-json-runtime</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+			<version>2.7.0</version>
 		</dependency>
 	</dependencies>
 
@@ -38,14 +38,14 @@
 			<plugin>
 				<groupId>com.amitapi</groupId>
 				<artifactId>amit-maven-plugin</artifactId>
-				<version>0.0.1-SNAPSHOT</version>
+				<version>2.0.0</version>
 				<executions>
 					<execution>
 						<configuration>
 							<templateJarClass>com.amit.api.templates.Location</templateJarClass>
-							<templateName>json-model</templateName>						
+							<templateName>model</templateName>						
 							<compileFile>amit-etalon.amit</compileFile>
-							<outputDirectory>src/main/tmp</outputDirectory>
+							<outputDirectory>src/main/java</outputDirectory>
 						</configuration>
 						<goals>
 							<goal>amit</goal>
