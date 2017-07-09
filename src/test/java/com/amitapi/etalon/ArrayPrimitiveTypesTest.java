@@ -5,12 +5,14 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.UUID;
 
 import org.junit.Test;
 
 import com.amitapi.etalon.json.ArrayPrimitiveTypesSerializer;
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
 
 public class ArrayPrimitiveTypesTest extends TestBase {
@@ -29,19 +31,67 @@ public class ArrayPrimitiveTypesTest extends TestBase {
 			.withTheDateItem(dateTime).withTheUiidItem(uuid);
 
 	@Test
-	public void testArrayPrimitiveSerializeJson() throws IOException {
+	public void testWrite() throws IOException {
 		StringWriter writer = new StringWriter();
-		JsonGenerator jp = generator(writer);
-		ArrayPrimitiveTypesSerializer.writeDynamic(jp, orig);
-		jp.close();
+		try (JsonGenerator jp = generator(writer)) {
+			ArrayPrimitiveTypesSerializer.writeDynamic(jp, orig);
+		}
 		assertEquals(json, writer.toString());
 	}
 
 	@Test
-	public void testArrayPrimitiveDeSerializeJson() throws IOException {
-		JsonParser jp = parser(json);
-		ArrayPrimitiveTypes obj = ArrayPrimitiveTypesSerializer.readDynamic(jp);
-		jp.close();
-		assertEquals(orig, obj);
+	public void testRead() throws IOException {
+		try (JsonParser jp = parser(json)) {
+			ArrayPrimitiveTypes obj = ArrayPrimitiveTypesSerializer
+					.readDynamic(jp);
+			assertEquals(orig, obj);
+		}
 	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testWriteBooleanArrayWitnNull() throws IOException {
+		ArrayPrimitiveTypes v = new ArrayPrimitiveTypes().withTheBoolenItem(
+				true).withTheBoolenItem(null);
+		StringWriter writer = new StringWriter();
+		try (JsonGenerator jp = generator(writer)) {
+			ArrayPrimitiveTypesSerializer.writeDynamic(jp, v);
+		}
+	}
+
+	@Test(expected = JsonParseException.class)
+	public void testeReadArrayBooleanWithNull() throws IOException {
+		try (JsonParser jp = parser("{\"theBoolen\":[true,null]}")) {
+			ArrayPrimitiveTypesSerializer.readDynamic(jp);
+		}
+	}
+
+	@Test
+	public void testeReadNullArray() throws IOException {
+		try (JsonParser jp = parser("{}")) {
+			ArrayPrimitiveTypes v = ArrayPrimitiveTypesSerializer
+					.readDynamic(jp);
+			assertEquals(v, new ArrayPrimitiveTypes());
+		}
+	}
+
+	@Test
+	public void testeReadEmptyArray() throws IOException {
+		try (JsonParser jp = parser("{\"theBoolen\":[],\"theInt\":[],\"theLong\":[],"
+				+ "\"theDouble\":[],\"theString\":[],\"theDate\":[],"
+				+ "\"theUiid\":[]}")) {
+			ArrayPrimitiveTypes v = ArrayPrimitiveTypesSerializer
+					.readDynamic(jp);
+			assertEquals(
+					v,
+					new ArrayPrimitiveTypes()
+							.withTheBoolen(new ArrayList<Boolean>())
+							.withTheDate(new ArrayList<LocalDateTime>())
+							.withTheDouble(new ArrayList<Double>())
+							.withTheInt(new ArrayList<Integer>())
+							.withTheLong(new ArrayList<Long>())
+							.withTheString(new ArrayList<String>())
+							.withTheUiid(new ArrayList<UUID>()));
+		}
+	}
+
 }

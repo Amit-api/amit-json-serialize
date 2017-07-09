@@ -31,54 +31,57 @@ public class PrimitiveTypeTest extends TestBase {
 	@Test
 	public void testWrite() throws IOException {
 		StringWriter writer = new StringWriter();
-		JsonGenerator jp = generator(writer);
-		PrimitiveTypesSerializer.writeDynamic(jp, orig);
-		jp.close();
+		try (JsonGenerator jp = generator(writer)) {
+			PrimitiveTypesSerializer.writeDynamic(jp, orig);
+		}
 		assertEquals(json, writer.toString());
 	}
 
 	@Test
 	public void testRead() throws IOException {
-		JsonParser jp = parser(json);
-		PrimitiveTypes obj = PrimitiveTypesSerializer.readDynamic(jp);
-		jp.close();
-		assertEquals(orig, obj);
+		try (JsonParser jp = parser(json)) {
+			PrimitiveTypes obj = PrimitiveTypesSerializer.readDynamic(jp);
+			assertEquals(orig, obj);
+		}
 	}
 
 	@Test(expected = JsonParseException.class)
 	public void testRead_badInt() throws IOException {
-		JsonParser jp = parser("{\"theInt\":\"10\"}");
-		PrimitiveTypesSerializer.readDynamic(jp);
+		try (JsonParser jp = parser("{\"theInt\":\"10\"}")) {
+			PrimitiveTypesSerializer.readDynamic(jp);
+		}
 	}
 
 	@Test(expected = JsonParseException.class)
 	public void testRead_badBoolean() throws IOException {
-		JsonParser jp = parser("{\"theBoolen\":1}");
-		PrimitiveTypesSerializer.readDynamic(jp);
+		try (JsonParser jp = parser("{\"theBoolen\":1}")) {
+			PrimitiveTypesSerializer.readDynamic(jp);
+		}
 	}
-	
-	@Test 
-	public void testRead_nullValue() throws IOException {		
-		JsonParser jp = parser("{\"theBoolen\":null}");
-		PrimitiveTypes r = PrimitiveTypesSerializer.readDynamic(jp);
-		assertNull(r.getTheBoolen());
-		jp.close();
+
+	@Test
+	public void testRead_nullValue() throws IOException {
+		try (JsonParser jp = parser("{\"theBoolen\":null}")) {
+			PrimitiveTypes r = PrimitiveTypesSerializer.readDynamic(jp);
+			assertNull(r.getTheBoolen());
+		}
 	}
-	
 
 	@Test
 	public void testPrimitiveDeSerializeJson_DirtyJson()
 			throws JsonParseException, IOException {
-		JsonParser jp = parser("{\"stuf\": { \"o\":1 }, \"array\":[1,2,3], \"theBoolen\":true, \"more\": [1,2]}");
-		assertEquals(new PrimitiveTypes().withTheBoolen(true),
-				PrimitiveTypesSerializer.readDynamic(jp));
+		try (JsonParser jp = parser("{\"stuf\": { \"o\":1 }, \"array\":[1,2,3], \"theBoolen\":true, \"more\": [1,2]}")) {
+			assertEquals(new PrimitiveTypes().withTheBoolen(true),
+					PrimitiveTypesSerializer.readDynamic(jp));
+		}
 	}
 
 	@Test(expected = JsonParseException.class)
 	public void testPrimitiveDeSerializeJson_PartialJson()
 			throws JsonParseException, IOException {
-		JsonParser jp = parser("{\"stuf\": { \"o\":1 }, \"array\":[1,2,3], \"theBoolen\":true, \"more\": [1,2] ");
-		assertEquals(new PrimitiveTypes().withTheBoolen(true),
-				PrimitiveTypesSerializer.readDynamic(jp));
+		try (JsonParser jp = parser("{\"stuf\": { \"o\":1 }, \"array\":[1,2,3], \"theBoolen\":true, \"more\": [1,2] ")) {
+			assertEquals(new PrimitiveTypes().withTheBoolen(true),
+					PrimitiveTypesSerializer.readDynamic(jp));
+		}
 	}
 }

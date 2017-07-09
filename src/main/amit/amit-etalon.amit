@@ -123,6 +123,7 @@ exception Derived2Exception : BaseException {
 exception ComplexTypeException {
 	Base base;
 	array Base moreBase;
+	map Base mapBase;
 }
 
 interface InterfaceTypes {
@@ -138,10 +139,44 @@ interface IntrfaceArrayTypes {
 	void storeOtherTypes( array string strV, array datetime dateV, array uuid uuidV ) throws MyArrayException;	
 }
 
+interface IntrfaceMapTypes {
+	void storeNumbers( map int intV, map boolean boolV, map long longV, map double doubleV ) throws MyArrayException;
+	
+	void storeOtherTypes( map string strV, map datetime dateV, map uuid uuidV ) throws MyArrayException;	
+}
+
 interface InterfaceReturn {
-	PrimitiveTypes getTypes( int id ) throws BaseException, MyArrayException;
-	array PrimitiveTypes getAllTypes() throws BaseException, MyArrayException;
-	void setTypes( PrimitiveTypes types ) throws MyException;
+	PrimitiveTypes getType();
+	array PrimitiveTypes getArrayType();
+	map PrimitiveTypes setTypes();
+	
+	int getInt();
+	long getLong();
+	double getDouble();
+	datetime getDateTime();
+	uuid getUUID();
+	boolean getBoolean();
+	string getString();
+	
+	array int getIntArray();
+	array long getLongArray();
+	array double getDoubleArray();
+	array datetime getDateTimeArray();
+	array uuid getUUIDArray();
+	array boolean getBooleanArray();
+	array string getStringArray();
+
+	map int getIntMap();
+	map long getLongMap();
+	map double getDoubleMap();
+	map datetime getDateTimeMap();
+	map uuid getUUIDMap();
+	map boolean getBooleanMap();
+	map string getStringMap();
+}
+
+interface InterfaceExceptions {
+	void doex() throws BaseException, ComplexTypeException;
 }
 
 interface AllInt : InterfaceTypes, IntrfaceArrayTypes, InterfaceReturn {
