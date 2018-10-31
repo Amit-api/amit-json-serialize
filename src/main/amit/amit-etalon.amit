@@ -24,7 +24,7 @@ enum MixedEnum {
 }
 
 type PrimitiveTypes {
-	boolean theBoolen;
+	boolean theBoolean;
 	int theInt;
 	long theLong;
 	double theDouble;
@@ -33,8 +33,18 @@ type PrimitiveTypes {
 	uuid theUiid;	
 }
 
+validation pt1 for PrimitiveTypes {
+	theBoolean !null;
+	theInt !null [1..1000];
+	theLong !null [..1000];
+	theDouble !null;
+	theString !null !empty [1..100];
+	theDate !null;
+	theUiid !null;
+}
+
 type ArrayPrimitiveTypes {
-	array boolean theBoolen;
+	array boolean theBoolean;
 	array int theInt;
 	array long theLong;
 	array double theDouble;
@@ -43,14 +53,36 @@ type ArrayPrimitiveTypes {
 	array uuid theUiid;	
 }
 
+validation pt2 for ArrayPrimitiveTypes {
+	theBoolean !null;
+	theInt !null [1..1000];
+	theInt[] !null [4..5];
+	theLong !null [..1000];
+	theDouble !null;
+	theString !null !empty [1..100];
+	theDate !null;
+	theUiid !null;
+}
+
 type MapPrimitiveTypes {
-	map boolean theBoolen;
+	map boolean theBoolean;
 	map int theInt;
 	map long theLong;
 	map double theDouble;
 	map string theString;
 	map datetime theDate;
 	map uuid theUiid;	
+}
+
+validation pt3 for MapPrimitiveTypes {
+	theBoolean !null;
+	theInt !null [1..1000];
+	theInt{} !null [..40];
+	theLong !null [..1000];
+	theDouble !null;
+	theString !null !empty [1..100];
+	theDate !null;
+	theUiid !null;
 }
 
 type Enums {
@@ -64,8 +96,16 @@ type Base {
 	int v1;
 }
 
+validation validateBaseType for Base {
+	v1 !null [0..100];
+}
+
 type Derived1 : Base {
 	int v2;
+}
+
+validation validateDerived1 for Derived1 {
+	v2 !null [0..100];
 }
 
 type Derived2 : Base {
@@ -75,6 +115,7 @@ type Derived2 : Base {
 type ComplexType {
 	Base base;
 	array Base moreBase;
+	map Base mapBase;
 }
 
 type CustomType {
@@ -87,8 +128,10 @@ type SimpleType {
 	map CustomType mtypes;
 }
 
+
+
 exception MyException {
-	boolean theBoolen;
+	boolean theBoolean;
 	int theInt;
 	long theLong;
 	double theDouble;
@@ -98,7 +141,7 @@ exception MyException {
 }
 
 exception MyArrayException {
-	array boolean theBoolen;
+	array boolean theBoolean;
 	array int theInt;
 	array long theLong;
 	array double theDouble;
@@ -123,8 +166,8 @@ exception Derived2Exception : BaseException {
 exception ComplexTypeException {
 	Base base;
 	array Base moreBase;
-	map Base mapBase;
 }
+
 
 interface InterfaceTypes {
 	
@@ -139,47 +182,54 @@ interface IntrfaceArrayTypes {
 	void storeOtherTypes( array string strV, array datetime dateV, array uuid uuidV ) throws MyArrayException;	
 }
 
-interface IntrfaceMapTypes {
-	void storeNumbers( map int intV, map boolean boolV, map long longV, map double doubleV ) throws MyArrayException;
-	
-	void storeOtherTypes( map string strV, map datetime dateV, map uuid uuidV ) throws MyArrayException;	
-}
-
 interface InterfaceReturn {
-	PrimitiveTypes getType();
-	array PrimitiveTypes getArrayType();
-	map PrimitiveTypes setTypes();
+	PrimitiveTypes returnType() throws BaseException, MyArrayException;
+	array PrimitiveTypes returnArrayType() throws BaseException, MyArrayException;
+	void returnVoid() throws BaseException, MyArrayException;
 	
-	int getInt();
-	long getLong();
-	double getDouble();
-	datetime getDateTime();
-	uuid getUUID();
-	boolean getBoolean();
-	string getString();
+	int returnInt() throws BaseException, MyArrayException;
+	boolean returnBoolean() throws BaseException, MyArrayException;
+	long returnLong() throws BaseException, MyArrayException;	
+	double returnDouble() throws BaseException, MyArrayException;	
+	datetime returnDatetime() throws BaseException, MyArrayException;
+	string retungString() throws BaseException, MyArrayException;
+	uuid retungUuid() throws BaseException, MyArrayException;
 	
-	array int getIntArray();
-	array long getLongArray();
-	array double getDoubleArray();
-	array datetime getDateTimeArray();
-	array uuid getUUIDArray();
-	array boolean getBooleanArray();
-	array string getStringArray();
+	array int returnIntArr() throws BaseException, MyArrayException;
+	array boolean returnBooleanArr() throws BaseException, MyArrayException;
+	array long returnLongArr() throws BaseException, MyArrayException;	
+	array double returnDoubleArr() throws BaseException, MyArrayException;	
+	array datetime returnDatetimeArr() throws BaseException, MyArrayException;
+	array string retungStringArr() throws BaseException, MyArrayException;
+	array uuid retungUuidArr() throws BaseException, MyArrayException;
 
-	map int getIntMap();
-	map long getLongMap();
-	map double getDoubleMap();
-	map datetime getDateTimeMap();
-	map uuid getUUIDMap();
-	map boolean getBooleanMap();
-	map string getStringMap();
+	map int returnIntMap() throws BaseException, MyArrayException;
+	map boolean returnBooleanMap() throws BaseException, MyArrayException;
+	map long returnLongMap() throws BaseException, MyArrayException;	
+	map double returnDoubleMap() throws BaseException, MyArrayException;	
+	map datetime returnDatetimeMap() throws BaseException, MyArrayException;
+	map string retungStringMap() throws BaseException, MyArrayException;
+	map uuid retungUuidMap() throws BaseException, MyArrayException;
 }
 
-interface InterfaceExceptions {
-	void doex() throws BaseException, ComplexTypeException;
+interface ValidateCalls {
+	void validateprimitive( int intV, boolean boolV, long longV, double doubleV )
+		validate {
+			intV !null [1..100];
+			boolV !null;
+			longV !null [1..200];
+		}; 
+		
+	void validateComplextType( ComplexType complex )
+		validate {
+			complex !null;
+			validateBaseType;
+			validateDerived1;
+		};
 }
 
 interface AllInt : InterfaceTypes, IntrfaceArrayTypes, InterfaceReturn {
 	void doNothing();
 }
+
 

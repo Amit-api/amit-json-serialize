@@ -30,13 +30,13 @@ public class SpeedTest extends TestBase {
 		count = 10000000;
 		warmUpCount = 10000;
 		deserialize = 
-			"{\"theBoolen\":true,\"theUiid\":null,\"theDate\":null,\"theLong\":%s,\"theString\":\"Hello\"," +
+			"{\"theBoolean\":true,\"theUiid\":null,\"theDate\":null,\"theLong\":%s,\"theString\":\"Hello\"," +
 					"\"theDouble\":0.0,\"theInt\":%s}";
 		array = new PrimitiveTypes[objCount];
 		strings = new String[objCount];
 
 		for (int i = 0; i < objCount; i++) {
-			array[i] = new PrimitiveTypes().withTheBoolen(true).withTheInt(i)
+			array[i] = new PrimitiveTypes().withTheBoolean(true).withTheInt(i)
 					.withTheLong((long) i).withTheDouble((double) i)
 					.withTheString("Hello");
 		}		
